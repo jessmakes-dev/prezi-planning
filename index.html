@@ -53,6 +53,14 @@ h2.sec{font-size:14px;font-weight:600;color:var(--berry2);margin:18px 2px 8px}
 .ft.z{background:var(--blush);color:var(--pink2);border-color:var(--pink2)}
 @keyframes fl{from{transform:rotateX(90deg)}to{transform:none}}
 .today{display:inline-block;background:var(--red);color:var(--cream);font-size:20px;font-weight:700;border:3px solid var(--ink);border-radius:12px;padding:3px 10px;margin:4px 0}
+.xb{position:relative;display:flex;align-items:center;gap:10px;width:100%;background:#fff;border:2px solid var(--blush);border-radius:14px;padding:18px 14px 20px;margin:2px 0 10px;text-align:left;color:var(--ink)}
+.xb::after{content:'';position:absolute;left:0;right:0;bottom:0;height:6px;background:repeating-linear-gradient(45deg,var(--red) 0 7px,#fff 7px 14px);border-radius:0 0 12px 12px}
+.xb .xl{flex:1;font-size:14px;color:var(--berry2)}
+.xb .xs{font-size:13px;color:var(--berry2)}
+.mts{display:flex;gap:3px}
+.mt{position:relative;display:inline-block;background:var(--red);color:#fff;font-size:14px;font-weight:700;width:22px;text-align:center;border-radius:6px;border:2px solid var(--ink);line-height:1.45}
+.mt.z{background:var(--blush);color:var(--pink2);border-color:var(--pink2)}
+.mt .hat{position:absolute;left:-7px;top:-12px;transform:rotate(-14deg);pointer-events:none}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px}
 .chip{font-size:13px;background:#fff;border:1.5px solid var(--blush);border-radius:12px;padding:4px 10px;color:var(--ink);text-align:left}
 button.chip{min-height:34px}
@@ -357,7 +365,9 @@ function vHome(){const se=season(),E=events();let h='';
  if(se.xday)h+=`<div class="banner xd">${santaHead(48,true)}<span><b>Merry Christmas!</b><small>Santa says thanks for all the planning.</small></span></div>`;
  const prim=se.festive?E.find(e=>e.k==='xmas')||E[0]:E[0];
  h+=prim?countdown(prim):`<div class="cd" style="background:#fff;border-color:var(--blush)"><div class="lb">Tick an occasion on someone's profile to start a countdown.</div>${pip('bow',60)}</div>`;
- const rest=E.filter(e=>e!==prim).slice(0,2),miss=S.people.filter(p=>p.occ.bday.on&&!p.bday);
+ const xe=E.find(e=>e.k==='xmas'),showXB=xe&&prim&&prim.k!=='xmas';
+ if(showXB){const s3=String(xe.days).padStart(3,'0');let lead=true;const tl=[...s3].map((c,i)=>{const z=lead&&c==='0'&&i<2;if(!z)lead=false;return`<span class="mt${z?' z':''}">${i===0?'<svg class="hat" width="24" height="15" viewBox="0 0 44 28" aria-hidden="true"><path d="M6 22 Q12 0 34 4 L38 22Z" fill="#E8414F" stroke="#3A1328" stroke-width="3"/><rect x="3" y="19" width="38" height="8" rx="4" fill="#fff" stroke="#3A1328" stroke-width="3"/><circle cx="35" cy="5" r="4" fill="#fff" stroke="#3A1328" stroke-width="3"/></svg>':''}${c}</span>`}).join('');h+=`<button class="xb" data-go="xmas" aria-label="Christmas is ${xe.days} sleeps away. Open the Christmas tab"><span class="xl">Christmas is</span><span class="mts">${tl}</span><span class="xs">${xe.days===1?'sleep':'sleeps'} away</span></button>`}
+ const rest=E.filter(e=>e!==prim&&!(showXB&&e===xe)).slice(0,2),miss=S.people.filter(p=>p.occ.bday.on&&!p.bday);
  h+=`<div class="chips">${rest.map(e=>`<span class="chip">Then: ${esc(e.label)} · ${fmtDM(e.date)}</span>`).join('')}${miss.length?`<button class="chip warn" data-person="${miss[0].id}">Add birthdays for ${miss.length} ${miss.length===1?'person':'people'}</button>`:''}</div>`;
  if(se.festive||se.nov){const L=xList(),b=L.filter(allBought).length;h+=`<button class="chip" data-go="xmas" style="margin-bottom:4px">Christmas shopping: ${b} of ${L.length} bought</button>`}
  const gs=[...GROUPS,...new Set(S.people.map(p=>p.group).filter(g=>!GROUPS.includes(g)))];
