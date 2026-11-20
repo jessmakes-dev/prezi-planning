@@ -1,0 +1,16 @@
+{
+  "name": "Prezi Planning",
+  "short_name": "Prezi Planning",
+  "description": "Year-round gift ideas for the people I love.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF4FA",
+  "theme_color": "#A23B72",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

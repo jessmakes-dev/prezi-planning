@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#A23B72">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Prezi Planning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<style>
+/* VOICE: playful and warm, a gift-planning friend that lives on Jess's phone
+   IDEA: a shelf of wrapped presents, one per person, that fills up all year
+   PICTURE: chunky cute characters (Pip, Santa, Petal, Tie guy, Sprinkles) and wrapped-gift tiles
+   COLOUR and TYPE: Sugarplum pop (bubblegum, berry, mint, gold) on cream; Pacifico wordmark, system sans body
+   LAYOUT: phone-first single column, sticky header, bottom tabs, floating add button */
+:root{--cream:#FFF4FA;--pink:#F49AC1;--pink2:#E77FAE;--berry:#A23B72;--berry2:#7E2A57;--ink:#3A1328;--mint:#9BE3C9;--mint2:#E1F5EE;--gold:#FFD166;--gold2:#FFF3D1;--blush:#F4C0D1;--blush2:#FBEAF0;--red:#E8414F;--green:#3E9B6E;--muted:#B4889E;color-scheme:light}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip}
+#app{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;position:relative;background:var(--cream)}
+button{font:inherit;color:inherit;cursor:pointer}
+input,textarea,select{font:inherit;font-size:16px;color:var(--ink)}
+.ic{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+/* header */
+.hdr{position:sticky;top:0;z-index:30;background:var(--cream);border-bottom:2px solid var(--blush)}
+.hdr .bar{display:flex;align-items:center;gap:6px;padding:calc(8px + env(safe-area-inset-top)) 12px 6px}
+.brand{font-family:'Pacifico',cursive;font-size:25px;color:var(--berry);line-height:1.25;white-space:nowrap;margin:0;font-weight:400}
+.hdr .sp1{flex:1}
+.hbtn{width:42px;height:42px;border-radius:50%;border:2px solid currentColor;background:transparent;display:flex;align-items:center;justify-content:center;padding:0;color:var(--berry)}
+.hdr.fest{background:var(--berry);border-bottom:0}.hdr.fest .brand,.hdr.fest .hbtn{color:var(--cream)}
+.hdr.xday{background:var(--red)}.hdr.xday .brand{color:var(--gold)}
+.lights{display:block;width:100%;height:30px}
+/* main */
+main{padding:14px 12px calc(110px + env(safe-area-inset-bottom))}
+main.enter{animation:enter .35s ease-out}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+h2.sec{font-size:14px;font-weight:600;color:var(--berry2);margin:18px 2px 8px}
+.card{background:#fff;border:2px solid var(--blush);border-radius:18px;padding:12px 14px}
+/* banners */
+.banner{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:2px solid var(--ink);border-radius:18px;padding:10px 12px;margin-bottom:10px}
+.banner.adv{background:var(--red);color:var(--cream)}
+.banner.xd{background:var(--gold);color:var(--ink)}
+.banner b{display:block;font-size:15px}.banner small{font-size:13px;opacity:.9}
+/* countdown */
+.cd{display:flex;align-items:center;justify-content:space-between;gap:8px;border:2px solid;border-radius:18px;padding:12px 14px;margin-bottom:8px}
+.cd .lb{font-size:13px;color:var(--berry2)}
+.tiles{display:flex;gap:4px;margin:4px 0;perspective:200px}
+.ft{display:inline-block;background:var(--berry);color:var(--cream);font-size:26px;font-weight:700;width:36px;text-align:center;border-radius:9px;border:3px solid var(--ink);padding:1px 0;animation:fl .12s ease-out}
+.ft.z{background:var(--blush);color:var(--pink2);border-color:var(--pink2)}
+@keyframes fl{from{transform:rotateX(90deg)}to{transform:none}}
+.today{display:inline-block;background:var(--red);color:var(--cream);font-size:20px;font-weight:700;border:3px solid var(--ink);border-radius:12px;padding:3px 10px;margin:4px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px}
+.chip{font-size:13px;background:#fff;border:1.5px solid var(--blush);border-radius:12px;padding:4px 10px;color:var(--ink);text-align:left}
+button.chip{min-height:34px}
+.chip.warn{border-color:var(--pink2);background:var(--blush2);color:var(--berry)}
+/* people grid */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tile{background:#fff;border:2px solid var(--blush);border-radius:16px;padding:8px 4px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px;min-height:122px}
+.tile .nm{font-size:14px;font-weight:600;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .ct{font-size:12px;background:var(--blush2);color:var(--berry);border-radius:8px;padding:1px 8px}
+.art{position:relative;display:inline-block;line-height:0}
+.art .cbo{position:absolute;left:0;top:0;animation:cbout .5s .25s ease-in forwards}
+.art .win{animation:wrapin .75s .3s cubic-bezier(.3,1.5,.5,1) both;transform-origin:50% 100%}
+@keyframes cbout{to{opacity:0;transform:scale(.7)}}
+@keyframes wrapin{0%{opacity:0;transform:scale(.4) rotate(-12deg)}100%{opacity:1;transform:none}}
+.wob{animation:wob 3.6s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes wob{0%,78%,100%{transform:none}82%{transform:rotate(-7deg)}86%{transform:rotate(6deg)}90%{transform:rotate(-4deg)}94%{transform:rotate(2deg)}}
+.qm{animation:qm 2.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes qm{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-4px) rotate(8deg)}}
+.tile.add{border-style:dashed;justify-content:center;color:var(--berry);font-weight:600;font-size:14px;gap:6px}
+.lid{transform-box:fill-box;transform-origin:0% 100%}
+.tile.lift .lid{animation:lift .5s ease-in-out forwards}
+@keyframes lift{0%{transform:none}100%{transform:translateY(-16px) rotate(-22deg)}}
+/* person */
+.back{display:inline-flex;align-items:center;gap:4px;background:none;border:0;color:var(--berry);font-weight:600;padding:6px 4px;margin:-4px 0 6px;min-height:44px}
+.phead{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.phead h2{margin:0;font-size:26px;line-height:1.1}
+.phead .grp{font-size:13px;color:var(--berry2)}
+.phead .edit{margin-left:auto}
+.occ{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
+.occ .row{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--blush);border-radius:14px;padding:6px 10px}
+.occ .row b{font-size:14px}.occ .row span{font-size:13px;color:var(--berry2)}
+.occ .row .r{margin-left:auto;text-align:right}
+.idea{position:relative;background:#fff;border:2px solid var(--blush);border-radius:16px;padding:10px 12px;margin-bottom:8px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:transform .15s,background .15s}
+.idea.pressing{transform:scale(.97);background:var(--blush2)}
+.idea .txt{white-space:pre-wrap;overflow-wrap:anywhere}
+.lnk{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-size:14px;color:var(--berry);font-weight:600;text-decoration:none;background:var(--blush2);border-radius:10px;padding:5px 10px;max-width:100%}
+.lnk span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lnk .ic{width:16px;height:16px}
+.tag{display:inline-block;font-size:12px;background:var(--gold2);color:#7a5200;border-radius:8px;padding:1px 8px;margin-top:6px}
+.hint{font-size:13px;color:var(--berry2);margin:2px 2px 10px}
+.hist{background:transparent;border:2px dashed var(--blush);border-radius:14px;padding:8px 12px;margin-bottom:6px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.hist.pressing{background:var(--blush2)}
+.hist .meta{font-size:12px;color:var(--berry2)}
+.empty{text-align:center;color:var(--berry2);font-size:14px;padding:10px 6px}
+/* forms */
+.f{display:flex;flex-direction:column;gap:8px}
+.f textarea,.f input[type=text],.f input[type=date],.f select{width:100%;border:2px solid var(--blush);border-radius:12px;padding:10px 12px;background:#fff;min-height:46px}
+.f textarea{resize:vertical;min-height:70px}
+.f :focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.btn{min-height:46px;border-radius:14px;border:2px solid var(--ink);background:#fff;font-weight:600;padding:8px 14px}
+.btn.pri{background:var(--berry);color:var(--cream)}
+.btn.dan{background:#fff;color:#b3261e;border-color:#b3261e}
+.btn.gold{background:var(--gold)}
+.err{color:#b3261e;font-size:13px;min-height:1px}
+.lbl{font-size:13px;font-weight:600;color:var(--berry2);margin:4px 0 0}
+.who{display:flex;flex-wrap:wrap;gap:6px}
+.who label{position:relative}
+.who input{position:absolute;opacity:0}
+.who span{display:inline-block;border:2px solid var(--blush);border-radius:12px;padding:7px 11px;background:#fff;font-size:14px;min-height:40px}
+.who input:checked+span{background:var(--berry);color:var(--cream);border-color:var(--berry)}
+.who input:focus-visible+span{outline:3px solid var(--gold)}
+.oc{display:flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--blush);border-radius:12px;padding:6px 8px}
+.oc input[type=checkbox]{width:22px;height:22px;accent-color:var(--berry);flex:none}
+.oc .on{flex:1;font-size:15px}
+.oc input[type=text]{width:110px;min-height:38px;padding:6px 8px;border:2px solid var(--blush);border-radius:10px}
+/* tabs + fab */
+.tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;background:#fff;border-top:2px solid var(--blush);z-index:30;padding-bottom:env(safe-area-inset-bottom)}
+.tabs button{flex:1;background:none;border:0;padding:8px 4px 7px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:1px;position:relative;min-height:56px}
+.tabs button.on{color:var(--berry);font-weight:700}
+.dot{position:absolute;top:6px;left:calc(50% + 8px);width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid #fff}
+.fab{position:fixed;right:max(16px,calc(50% - 240px + 16px));bottom:calc(72px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:50%;background:var(--berry);color:var(--cream);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;z-index:31;animation:fab 2.4s ease-in-out infinite;padding:0}
+.fab .ic{width:30px;height:30px;stroke-width:3}
+@keyframes fab{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+/* sheet */
+#sheet{position:fixed;inset:0;z-index:50;pointer-events:none}
+#sheet .scrim{position:absolute;inset:0;background:rgba(58,19,40,.45);opacity:0;transition:opacity .25s}
+#sheet .panel{position:absolute;left:50%;bottom:0;width:100%;max-width:480px;max-height:88vh;overflow:auto;background:var(--cream);border:3px solid var(--ink);border-bottom:0;border-radius:24px 24px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,100%);transition:transform .3s cubic-bezier(.2,1.2,.4,1)}
+#sheet.open{pointer-events:auto}#sheet.open .scrim{opacity:1}#sheet.open .panel{transform:translate(-50%,0)}
+.panel h3{margin:0 0 10px;font-size:20px}
+.panel .acts{display:flex;flex-direction:column;gap:8px}
+.panel .acts .btn{width:100%;text-align:left;display:flex;align-items:center;gap:10px}
+.grab{width:44px;height:5px;border-radius:3px;background:var(--blush);margin:-6px auto 12px}
+.set{border-top:2px dashed var(--blush);padding-top:12px;margin-top:12px}
+.set p{font-size:14px;margin:0 0 8px}
+.row2{display:flex;gap:8px;flex-wrap:wrap}.row2 .btn{flex:1}
+/* toast */
+#toast{position:fixed;left:50%;bottom:calc(146px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:var(--cream);border-radius:16px;padding:8px 14px 8px 8px;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;opacity:0;transition:.3s;z-index:60;pointer-events:none;max-width:90vw}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+/* fx */
+#fx{position:fixed;inset:0;pointer-events:none;z-index:25;overflow:hidden}
+.spk{position:absolute;animation:tw 2.4s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.1;transform:scale(.5)}50%{opacity:1;transform:scale(1)}}
+.cf{position:fixed;top:-14px;width:9px;height:13px;border-radius:2px;z-index:70;pointer-events:none;animation:cf 3s ease-in forwards}
+@keyframes cf{to{transform:translateY(110vh) rotate(640deg);opacity:.2}}
+/* character motion */
+.bob{animation:bob 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+.wig{animation:wig 2s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+.blink{animation:blink 3.6s infinite;transform-box:fill-box;transform-origin:center}
+.bu{animation:bl 1.2s infinite}
+.tws{animation:tw 2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.fk{animation:fk .5s infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes bob{0%,100%{transform:none}50%{transform:translateY(-6px)}}
+@keyframes wig{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+@keyframes blink{0%,92%,100%{transform:none}95%{transform:scaleY(.1)}}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes fk{0%,100%{transform:none}50%{transform:scale(.8,1.2)}}
+.spin{animation:spin .7s ease-in-out}@keyframes spin{to{transform:rotate(360deg)}}
+/* christmas tab */
+.xstage{display:flex;align-items:flex-end;gap:8px;margin:6px 0 8px}
+.bub{position:relative;background:#fff;border:2px solid var(--berry);border-radius:16px 16px 16px 4px;padding:8px 24px 8px 10px;font-size:14px;line-height:1.4;min-height:58px}
+.holly{position:absolute;top:-10px;right:-6px}
+.prog{height:16px;background:var(--blush);border-radius:8px;overflow:hidden;border:2px solid var(--ink);margin-top:4px}
+.prog i{display:block;height:100%;background:repeating-linear-gradient(45deg,var(--red) 0 6px,#fff 6px 12px);transition:width .4s}
+#santa,#aL,#aR{transform-box:fill-box}#santa{transform-origin:50% 100%}#aL,#aR{transform-origin:50% 10%}
+.s-worried #santa{animation:sw 3s ease-in-out infinite}.s-thinking #santa{animation:sw 1.4s ease-in-out infinite}
+.s-ready #santa,.s-happy #santa{animation:hop .9s ease-in-out infinite}.s-happy #aR{animation:wv .5s ease-in-out infinite alternate}
+.s-party #santa{animation:dn .7s linear infinite}.s-party #aR{animation:wv .3s infinite alternate}.s-party #aL{animation:wl .3s infinite alternate}
+@keyframes sw{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes hop{0%,100%{transform:none}50%{transform:translateY(-8px)}}
+@keyframes dn{0%,100%{transform:rotate(-12deg)}25%{transform:translateY(-12px)}50%{transform:rotate(12deg)}75%{transform:translateY(-12px)}}
+@keyframes wv{from{transform:rotate(-20deg)}to{transform:rotate(-140deg)}}
+@keyframes wl{from{transform:rotate(20deg)}to{transform:rotate(140deg)}}
+.stock{transform-box:fill-box;transform-origin:50% 0;animation:sock 3s ease-in-out infinite}
+@keyframes sock{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+.xrow{display:flex;align-items:center;gap:8px}
+.xcard{background:#fff;border:2px solid var(--blush);border-radius:14px;padding:8px 10px;margin-bottom:8px}
+.xcard.done{border-color:var(--gold);background:#FFFBEF}
+.glist{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.gline{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:var(--cream);border:2px solid var(--blush);border-radius:12px;padding:7px 10px;min-height:44px;font-size:14px}
+.gline span{flex:1}
+.gline em{font-style:normal;font-size:12px;font-weight:700;color:#7a5200;background:var(--gold);border-radius:8px;padding:1px 8px}
+.gline.on{background:var(--gold2);border-color:var(--gold)}.gline.on .ic{fill:var(--gold)}
+.gline.pp{animation:pop .3s}
+.tg .n{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:10px;background:var(--gold);color:var(--ink);font-size:11px;font-weight:700;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center}
+.tg{position:relative}
+.lk{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--blush);border-radius:12px;padding:8px 10px;min-height:48px}
+.lk input{width:22px;height:22px;accent-color:var(--berry);flex:none}
+.lk.has{border-color:var(--berry)}
+.xrow .who2{flex:1;min-width:0}
+.xrow .who2 b{display:block;font-size:15px}
+.xrow .who2 small{display:block;font-size:12px;color:var(--berry2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tg{width:44px;height:44px;border-radius:50%;border:2px solid var(--ink);background:#fff;padding:0;display:flex;align-items:center;justify-content:center;flex:none}
+.tg.on1{background:var(--berry);color:#fff}.tg.on2{background:var(--gold)}.tg.on2 .ic{fill:var(--ink)}
+.tg.pp{animation:pop .3s}@keyframes pop{50%{transform:scale(1.3)}}
+.ss{display:flex;align-items:center;gap:8px;font-size:14px;margin:4px 0 8px;flex-wrap:wrap}
+.ss select{flex:1;min-width:150px;min-height:42px;border:2px solid var(--blush);border-radius:12px;padding:6px 10px;background:#fff}
+.scene{display:block;width:calc(100% + 24px);margin:16px -12px 0;border-top:3px solid var(--ink)}
+@keyframes fly{0%{transform:translate(-190px,92px)}50%{transform:translate(90px,34px)}100%{transform:translate(380px,74px)}}
+#sl{animation:fly 11s linear infinite}
+@keyframes gal{0%,100%{transform:none}50%{transform:translateY(-3px)}}.gl{animation:gal .4s infinite}
+/* advent */
+.agrid{display:grid;grid-template-columns:repeat(4,68px);gap:8px;justify-content:center;margin:8px 0 12px}
+.door{width:68px;height:60px;position:relative;perspective:300px;padding:0;border:0;background:none}
+.door .in{position:absolute;inset:0;background:#fff;border:2px dashed var(--pink2);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--berry)}
+.door .flap{position:absolute;inset:0;border:2px solid var(--ink);border-radius:8px;transform-origin:left center;transition:transform .8s cubic-bezier(.3,1.5,.5,1);background-size:296px 400px}
+.door.op .flap{transform:rotateY(-105deg)}
+.door .num{position:absolute;top:4px;left:4px;min-width:22px;height:22px;border-radius:11px;background:var(--gold);border:2px solid var(--ink);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.door.td .flap{animation:pu 1.4s infinite}
+@keyframes pu{0%,100%{box-shadow:0 0 0 0 var(--gold)}50%{box-shadow:0 0 0 5px var(--gold)}}
+.door.shk{animation:shk .3s 2}@keyframes shk{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.adet{display:flex;gap:10px;align-items:center;background:#fff;border:2px solid var(--berry);border-radius:16px;padding:10px 12px;animation:enter .4s ease-out}
+.adet small{display:block;color:var(--berry);font-weight:700;font-size:12px}
+/* nov peek */
+#peek{position:fixed;right:max(0px,calc(50% - 240px));bottom:calc(150px + env(safe-area-inset-bottom));z-index:29;transform:translateX(110%);transition:transform .7s cubic-bezier(.3,1.4,.5,1);display:flex;align-items:center;gap:4px;background:none;border:0;padding:0}
+#peek.show{transform:translateX(26%)}
+#peek .pb{background:#fff;border:2px solid var(--red);border-radius:14px 14px 4px 14px;padding:6px 10px;font-size:13px;font-weight:700;color:var(--red);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01s!important;animation-iteration-count:1!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<symbol id="f" viewBox="0 0 40 22"><ellipse class="blink" cx="11" cy="7" rx="3" ry="4" fill="#3A1328"/><ellipse class="blink" cx="29" cy="7" rx="3" ry="4" fill="#3A1328"/><circle cx="4" cy="14" r="3.5" fill="#FF6FA5" opacity=".55"/><circle cx="36" cy="14" r="3.5" fill="#FF6FA5" opacity=".55"/><path d="M15 13 Q20 19 25 13" stroke="#3A1328" stroke-width="2.5" fill="none" stroke-linecap="round"/></symbol>
+<pattern id="cc" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#fff"/><rect width="4" height="8" fill="#E8414F"/></pattern>
+<pattern id="gd" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#3E9B6E"/><circle cx="4" cy="4" r="1.6" fill="#fff"/></pattern>
+<pattern id="rs" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#E8414F"/><path d="M5 2 L6 4.5 L8.5 5 L6 5.5 L5 8 L4 5.5 L1.5 5 L4 4.5Z" fill="#FFD166"/></pattern>
+<pattern id="bs" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#A23B72"/><circle cx="3" cy="3" r="1.3" fill="#FFD166"/><circle cx="8" cy="8" r="1.3" fill="#FFF4FA"/></pattern>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9h-5v-6H9v6H4z"/></symbol>
+<symbol id="i-tree" viewBox="0 0 24 24"><path d="M12 3 6 11h3l-4 6h14l-4-6h3zM12 17v4"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+<symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/></symbol>
+<symbol id="i-belloff" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 21h4M3 3l18 18"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12" rx="2"/><path d="M12 9v12M3 13h18M12 9C9 9 7 4 9.5 4S12 9 12 9s.5-5 2.5-5S15 9 12 9"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 7 4 12l5 5M4 12h11a5 5 0 0 1 0 10h-2"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+</defs>
+</svg>
+<div id="app">
+  <header class="hdr" id="hdr"></header>
+  <main id="view"></main>
+</div>
+<div id="fx" aria-hidden="true"></div>
+<button class="fab" id="fab" aria-label="Add a gift idea"><svg class="ic"><use href="#i-plus"/></svg></button>
+<nav class="tabs" id="tabs" aria-label="Sections"></nav>
+<button id="peek" aria-label="Christmas is coming. Open the Christmas tab"></button>
+<div id="sheet"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+{
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-5);
+const ic=n=>`<svg class="ic" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const KEY='prezi-planning-v1';
+const OCC={bday:'Birthday',xmas:'Christmas',mum:"Mother's Day",dad:"Father's Day"};
+const GROUPS=['Immediate family','Extended family','Secret Santa crew','Friends','Ideas only'];
+const SSG='Secret Santa crew';
+
+/* ---------- data ---------- */
+function mk(name,group,occ){const o={};for(const k in OCC)o[k]={on:k in occ,budget:occ[k]||''};return{id:uid(),name,group,occ:o,bday:'',ideas:[],history:[]}}
+function seed(){return{v:1,people:[
+ mk('Mum','Immediate family',{bday:'$50–60',xmas:'$50–60',mum:'$50–60'}),
+ mk('Dad','Immediate family',{bday:'$50–60',xmas:'$50–60',dad:'$50–60'}),
+ mk('Daniel','Immediate family',{bday:'$50',xmas:'$50'}),
+ mk('Granddad','Extended family',{bday:'$50–60',xmas:'$50–60'}),
+ mk('Uncle Jason','Extended family',{bday:'$50–60',xmas:'$50–60'}),
+ mk('Auntie Rose','Extended family',{bday:'$50–60',xmas:'$50–60'}),
+ mk('Nona',SSG,{xmas:'~$30'}),mk('Uncle Paul',SSG,{xmas:'~$30'}),mk('Nick',SSG,{xmas:'~$30'}),mk('Tessa',SSG,{xmas:'~$30'}),
+ mk('Ben','Ideas only',{}),mk('Siena','Ideas only',{})],
+ xmas:{drawn:'',items:{}},advent:{year:0,opened:[]},settings:{sound:true,pretend:''}}}
+let S=null;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+function fix(s){if(!s||!Array.isArray(s.people))return null;s.xmas=s.xmas||{drawn:'',items:{}};s.xmas.items=s.xmas.items||{};s.advent=s.advent||{year:0,opened:[]};s.settings=Object.assign({sound:true,pretend:''},s.settings||{});s.people.forEach(p=>{p.ideas=p.ideas||[];p.history=p.history||[];p.occ=p.occ||{};for(const k in OCC)p.occ[k]=p.occ[k]||{on:false,budget:''}});return s}
+S=fix(S)||seed();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const byId=id=>S.people.find(p=>p.id===id);
+
+/* ---------- dates ---------- */
+function now(){const p=S.settings.pretend;if(p){const[y,m,d]=p.split('-').map(Number);return new Date(y,m-1,d)}const t=new Date();return new Date(t.getFullYear(),t.getMonth(),t.getDate())}
+function nthSun(y,m,n){const d=new Date(y,m,1);return new Date(y,m,(7-d.getDay())%7+1+7*(n-1))}
+function nextOf(fn){const t=now();let d=fn(t.getFullYear());if(d<t)d=fn(t.getFullYear()+1);return d}
+const XMAS=y=>new Date(y,11,25),MUMS=y=>nthSun(y,4,2),DADS=y=>nthSun(y,8,1);
+const daysTo=d=>Math.round((d-now())/864e5);
+const fmt=d=>d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
+const fmtDM=d=>d.toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+function bdayNext(p){if(!p.bday)return null;const[,m,d]=p.bday.split('-').map(Number);if(!m||!d)return null;return nextOf(y=>new Date(y,m-1,d))}
+function occDate(p,k){return k==='xmas'?nextOf(XMAS):k==='mum'?nextOf(MUMS):k==='dad'?nextOf(DADS):bdayNext(p)}
+function season(){const t=now(),m=t.getMonth(),d=t.getDate();return{nov:m===10,advent:m===11&&d<=24,xday:m===11&&d===25,festive:m===11&&d<=25,wrap:m===10||m===11,day:d,year:t.getFullYear()}}
+function events(){const E=[],P=S.people,any=k=>P.some(p=>p.occ[k].on);
+ if(any('xmas'))E.push({k:'xmas',label:'Christmas',date:nextOf(XMAS)});
+ if(any('mum'))E.push({k:'mum',label:"Mother's Day",date:nextOf(MUMS)});
+ if(any('dad'))E.push({k:'dad',label:"Father's Day",date:nextOf(DADS)});
+ P.forEach(p=>{if(p.occ.bday.on){const d=bdayNext(p);if(d)E.push({k:'bday',label:p.name+"'s birthday",date:d,pid:p.id})}});
+ E.forEach(e=>e.days=daysTo(e.date));return E.sort((a,b)=>a.days-b.days)}
+
+/* ---------- characters ---------- */
+const WA=[['#F49AC1','#A23B72'],['#9BE3C9','#A23B72'],['#FFD166','#E77FAE'],['#A23B72','#FFD166'],['#E77FAE','#FFF4FA'],['#9BE3C9','#E77FAE']];
+const WD=[['url(#cc)','#3E9B6E'],['url(#gd)','#E8414F'],['url(#rs)','#3E9B6E'],['#3E9B6E','#E8414F'],['url(#bs)','#E8414F'],['#E8414F','#FFD166']];
+function wrapOf(p){const i=Math.max(0,S.people.indexOf(p)),W=season().wrap?WD:WA;return W[i%W.length]}
+function gift(w,s,holly){return`<svg width="${s}" height="${Math.round(s*64/70)}" viewBox="0 0 70 64" aria-hidden="true"><rect x="6" y="24" width="58" height="38" rx="6" fill="${w[0]}" stroke="#3A1328" stroke-width="2.5"/><rect x="31" y="25" width="8" height="36" fill="${w[1]}"/><g class="lid"><rect x="2" y="14" width="66" height="13" rx="5" fill="${w[0]}" stroke="#3A1328" stroke-width="2.5"/><rect x="31" y="15" width="8" height="11" fill="${w[1]}"/><ellipse cx="25" cy="8" rx="9" ry="6" fill="${w[1]}" stroke="#3A1328" stroke-width="2"/><ellipse cx="45" cy="8" rx="9" ry="6" fill="${w[1]}" stroke="#3A1328" stroke-width="2"/><circle cx="35" cy="10" r="4" fill="${w[1]}" stroke="#3A1328" stroke-width="2"/>${holly?'<ellipse cx="58" cy="12" rx="5" ry="3" fill="#3E9B6E" stroke="#3A1328" stroke-width="1.2" transform="rotate(-25 58 12)"/><circle cx="54" cy="15" r="2.2" fill="#E8414F" stroke="#3A1328" stroke-width="1"/>':''}</g></svg>`}
+const ACC={
+ bow:'<ellipse cx="34" cy="21" rx="10" ry="7" fill="#A23B72" stroke="#3A1328" stroke-width="4"/><ellipse cx="56" cy="21" rx="10" ry="7" fill="#A23B72" stroke="#3A1328" stroke-width="4"/><circle cx="45" cy="23" r="5" fill="#7E2A57" stroke="#3A1328" stroke-width="4"/>',
+ hat:'<path d="M18 30 Q30 -6 68 4 L72 30Z" fill="#E8414F" stroke="#3A1328" stroke-width="4" stroke-linejoin="round"/><rect x="12" y="26" width="66" height="12" rx="6" fill="#fff" stroke="#3A1328" stroke-width="4"/><circle cx="68" cy="5" r="7" fill="#fff" stroke="#3A1328" stroke-width="4"/>',
+ antlers:'<path d="M32 30 L26 8 M29 18 L18 14 M58 30 L64 8 M61 18 L72 14" stroke="#8B5A3C" stroke-width="5" stroke-linecap="round"/>',
+ tinsel:'<path d="M14 42 Q22 36 30 42 Q38 48 46 42 Q54 36 62 42 Q70 48 76 42" fill="none" stroke="#FFD166" stroke-width="6" stroke-linecap="round"/><path d="M62 44 L66 62" stroke="#FFD166" stroke-width="5" stroke-linecap="round"/>',
+ sunnies:'<rect x="28" y="54" width="15" height="10" rx="4" fill="#3A1328"/><rect x="47" y="54" width="15" height="10" rx="4" fill="#3A1328"/><path d="M43 58 H47" stroke="#3A1328" stroke-width="2.5"/>',
+ elf:'<path d="M18 32 Q36 -8 82 8 Q62 12 72 32Z" fill="#3E9B6E" stroke="#3A1328" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="27" width="62" height="11" rx="5.5" fill="#E8414F" stroke="#3A1328" stroke-width="3"/><circle cx="82" cy="8" r="5" fill="#FFD166" stroke="#3A1328" stroke-width="2.5"/>'};
+function pip(o,s,cls='bob'){const extra=o==='tinsel'||o==='sunnies'?ACC.bow:'';const top=o==='bow'?ACC.bow:'';const face=o==='sunnies'?'':'<use href="#f" x="25" y="52" width="40" height="22"/>';const smile=o==='sunnies'?'<path d="M40 70 Q45 75 50 70" stroke="#3A1328" stroke-width="3" fill="none" stroke-linecap="round"/>':'';return`<svg width="${s}" height="${s}" viewBox="0 0 90 90" aria-hidden="true"><g class="${cls}"><rect x="18" y="38" width="54" height="44" rx="10" fill="#F49AC1" stroke="#3A1328" stroke-width="4"/><rect x="41" y="40" width="8" height="40" fill="#A23B72"/><rect x="14" y="28" width="62" height="14" rx="6" fill="#E77FAE" stroke="#3A1328" stroke-width="4"/>${top}${extra}${face}${smile}${o!=='bow'?ACC[o]||'':''}</g></svg>`}
+function petal(s){return`<svg width="${s}" height="${s}" viewBox="0 0 90 90" aria-hidden="true"><g class="wig"><path d="M30 60 L45 86 L60 60Z" fill="#9BE3C9" stroke="#3A1328" stroke-width="3" stroke-linejoin="round"/>${[[62,36],[53.5,51],[36.5,51],[28,36],[36.5,21],[53.5,21]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="10" fill="#F49AC1" stroke="#3A1328" stroke-width="3"/>`).join('')}<circle cx="45" cy="36" r="15" fill="#FFD166" stroke="#3A1328" stroke-width="3"/><ellipse class="blink" cx="40" cy="33" rx="2.5" ry="3.5" fill="#3A1328"/><ellipse class="blink" cx="50" cy="33" rx="2.5" ry="3.5" fill="#3A1328"/><path d="M41 39 Q45 43 49 39" stroke="#3A1328" stroke-width="2.5" fill="none" stroke-linecap="round"/></g></svg>`}
+function tie(s){return`<svg width="${s}" height="${s}" viewBox="0 0 90 90" aria-hidden="true"><g class="wig" style="transform-origin:50% 0"><path d="M36 28 L54 28 L68 66 L45 86 L22 66Z" fill="#A23B72" stroke="#3A1328" stroke-width="3" stroke-linejoin="round"/><path d="M30 72 L60 42 M38 80 L64 54" stroke="#FFD166" stroke-width="3"/><polygon points="32,12 58,12 54,28 36,28" fill="#E77FAE" stroke="#3A1328" stroke-width="3" stroke-linejoin="round"/><circle cx="38" cy="45" r="6.5" fill="#FFF4FA" stroke="#3A1328" stroke-width="2.5"/><circle cx="52" cy="45" r="6.5" fill="#FFF4FA" stroke="#3A1328" stroke-width="2.5"/><path d="M44.5 45 H45.5" stroke="#3A1328" stroke-width="2.5"/><ellipse class="blink" cx="38" cy="45" rx="2" ry="3" fill="#3A1328"/><ellipse class="blink" cx="52" cy="45" rx="2" ry="3" fill="#3A1328"/><path d="M35 57 Q40 52 45 56 Q50 52 55 57 Q50 61 45 58 Q40 61 35 57Z" fill="#3A1328"/><path d="M41 63 Q45 66 49 63" stroke="#3A1328" stroke-width="2.5" fill="none" stroke-linecap="round"/></g></svg>`}
+function cupcake(s){return`<svg width="${s}" height="${s}" viewBox="0 0 90 90" aria-hidden="true"><ellipse class="fk" cx="45" cy="10" rx="4" ry="6" fill="#FFBF3C" stroke="#3A1328" stroke-width="2"/><g class="bob"><rect x="42" y="16" width="6" height="16" rx="2" fill="#F49AC1" stroke="#3A1328" stroke-width="2.5"/><path d="M24 54 H66 L60 84 H30Z" fill="#F49AC1" stroke="#3A1328" stroke-width="3" stroke-linejoin="round"/><path d="M20 56 Q16 40 31 40 Q33 28 45 30 Q57 28 59 40 Q74 40 70 56Z" fill="#9BE3C9" stroke="#3A1328" stroke-width="3" stroke-linejoin="round"/><rect x="32" y="40" width="5" height="2.5" rx="1" fill="#A23B72" transform="rotate(30 34 41)"/><rect x="52" y="38" width="5" height="2.5" rx="1" fill="#FFD166" transform="rotate(-25 54 39)"/><rect x="44" y="45" width="5" height="2.5" rx="1" fill="#E8414F"/><use href="#f" x="25" y="58" width="40" height="22"/></g></svg>`}
+function tree(w,withPip){const vb=withPip?110:60;return`<svg width="${w}" height="${Math.round(w*70/vb)}" viewBox="0 0 ${vb} 70" aria-hidden="true"><rect x="25" y="61" width="10" height="8" fill="#8B5A3C" stroke="#3A1328" stroke-width="2"/><polygon points="30,30 4,62 56,62" fill="#3E9B6E" stroke="#3A1328" stroke-width="2.5" stroke-linejoin="round"/><polygon points="30,18 9,46 51,46" fill="#3E9B6E" stroke="#3A1328" stroke-width="2.5" stroke-linejoin="round"/><polygon points="30,8 13,32 47,32" fill="#3E9B6E" stroke="#3A1328" stroke-width="2.5" stroke-linejoin="round"/>${[[24,27,'#E8414F',0],[36,38,'#FFD166',.4],[20,42,'#F49AC1',.8],[32,53,'#E8414F',.2],[16,58,'#FFD166',.6],[45,57,'#F49AC1',1]].map(b=>`<circle class="bu" style="animation-delay:${b[3]}s" cx="${b[0]}" cy="${b[1]}" r="3" fill="${b[2]}"/>`).join('')}<path class="tws" d="M30 0 L32 5 L37 7 L32 9 L30 14 L28 9 L23 7 L28 5Z" fill="#FFD166" stroke="#3A1328" stroke-width="1.5"/>${withPip?`<g transform="translate(60,22) scale(.52)"><g class="bob"><rect x="18" y="38" width="54" height="44" rx="10" fill="#F49AC1" stroke="#3A1328" stroke-width="4"/><rect x="41" y="40" width="8" height="40" fill="#A23B72"/>${ACC.hat}<use href="#f" x="25" y="52" width="40" height="22"/></g></g>`:''}</svg>`}
+function santaHead(s,wave){return`<svg width="${s}" height="${s}" viewBox="0 0 90 90" aria-hidden="true"><g class="bob">${wave?'<g class="wig" style="transform-origin:50% 100%"><ellipse cx="80" cy="56" rx="7" ry="9" fill="#FFD9C2" stroke="#3A1328" stroke-width="3"/></g>':''}<circle cx="45" cy="46" r="22" fill="#FFD9C2" stroke="#3A1328" stroke-width="3"/><path d="M23 48 Q24 76 45 76 Q66 76 67 48 Q56 56 45 56 Q34 56 23 48Z" fill="#fff" stroke="#3A1328" stroke-width="3" stroke-linejoin="round"/><path d="M34 54 Q39 50 45 54 Q51 50 56 54 Q51 59 45 56 Q39 59 34 54Z" fill="#fff" stroke="#3A1328" stroke-width="2.5"/><ellipse class="blink" cx="37" cy="43" rx="3" ry="4" fill="#3A1328"/><ellipse class="blink" cx="53" cy="43" rx="3" ry="4" fill="#3A1328"/><circle cx="45" cy="49" r="4" fill="#F0997B" stroke="#3A1328" stroke-width="2"/><path d="M41 63 Q45 67 49 63" stroke="#3A1328" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M23 33 Q28 2 62 7 L68 33Z" fill="#E8414F" stroke="#3A1328" stroke-width="3" stroke-linejoin="round"/><rect x="20" y="27" width="50" height="11" rx="5.5" fill="#fff" stroke="#3A1328" stroke-width="3"/><circle cx="63" cy="7" r="6" fill="#fff" stroke="#3A1328" stroke-width="3"/></g></svg>`}
+const CHAR={xmas:s=>tree(s*1.5,true),mum:petal,dad:tie,bday:cupcake};
+const CBG={xmas:['#FFF4FA','#E8414F'],mum:['#E1F5EE','#9BE3C9'],dad:['#FFF3D1','#FFD166'],bday:['#FBEAF0','#F49AC1']};
+
+/* ---------- fx ---------- */
+let ac=null;
+function bells(){if(!S.settings.sound)return;try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;ac=ac||new A();if(ac.state==='suspended')ac.resume();const t=ac.currentTime;[2093,2637,2349,3136,2793].forEach((f,i)=>{const d=i*.07,o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t+d);g.gain.linearRampToValueAtTime(.1,t+d+.005);g.gain.exponentialRampToValueAtTime(.001,t+d+.6);o.connect(g);g.connect(ac.destination);o.start(t+d);o.stop(t+d+.65)})}catch(e){}}
+function confetti(n=50){const C=['#F49AC1','#9BE3C9','#FFD166','#A23B72','#E8414F','#3E9B6E'];for(let k=0;k<n;k++){const d=document.createElement('div');d.className='cf';d.style.left=Math.random()*100+'vw';d.style.background=C[k%C.length];d.style.animationDelay=Math.random()*.7+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),4200)}}
+let toastT;function toast(msg,withPip=true){const t=$('#toast');t.innerHTML=(withPip?pip(season().festive?'hat':'bow',34,'spin'):'')+`<span>${esc(msg)}</span>`;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600)}
+function sparkles(on){const fx=$('#fx');if(!on){fx.innerHTML='';fx.dataset.on='';return}if(fx.dataset.on)return;fx.dataset.on='1';const SC=['#FFD166','#F49AC1','#9BE3C9'];let h='';for(let k=0;k<18;k++){const sz=8+Math.random()*9;h+=`<svg class="spk" width="${sz}" height="${sz}" viewBox="0 0 12 12" style="left:${Math.random()*96}%;top:${8+Math.random()*80}%;animation-delay:${(Math.random()*2.4).toFixed(2)}s"><path d="M6 0 L7.5 4.5 L12 6 L7.5 7.5 L6 12 L4.5 7.5 L0 6 L4.5 4.5Z" fill="${SC[k%3]}"/></svg>`}fx.innerHTML=h}
+function lightsSVG(){const LC=['#FFD166','#9BE3C9','#F49AC1','#FF6B5B'];let b='';for(let k=0;k<16;k++){const x=11+k*21,y=4+11*Math.sin(Math.PI*(x%85)/85);b+=`<ellipse class="bu" style="animation-delay:${(k%4)*.3}s" cx="${x}" cy="${(y+7).toFixed(1)}" rx="4" ry="6" fill="${LC[k%4]}" stroke="#3A1328" stroke-width="1.5"/>`}return`<svg class="lights" viewBox="0 0 340 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0 4 Q42 26 85 4 Q127 26 170 4 Q212 26 255 4 Q297 26 340 4" fill="none" stroke="#3A1328" stroke-width="2"/>${b}</svg>`}
+function tiles(n){const s=String(n).padStart(3,'0');let lead=true;return[...s].map((c,i)=>{const z=lead&&c==='0'&&i<s.length-1;if(!z)lead=false;return`<span class="ft${z?' z':''}">${c}</span>`}).join('')}
+function rollAll(){document.querySelectorAll('[data-roll]').forEach(el=>{const n=+el.dataset.roll;let v=n+12;const iv=setInterval(()=>{el.innerHTML=tiles(v);if(v<=n)clearInterval(iv);v--},85)})}
+
+/* ---------- state ---------- */
+let tab='home',pid=null,lastSanta='';
+function go(t,p=null){tab=t;pid=p;render(true);window.scrollTo(0,0)}
+
+/* ---------- header + tabs ---------- */
+function renderChrome(){if(tab==='advent'&&!season().advent)tab='home';const se=season(),fest=se.festive||tab==='xmas'||tab==='advent';const h=$('#hdr');h.className='hdr'+(fest?' fest':'')+(se.xday?' xday':'');
+ const sound=(tab==='xmas'||tab==='advent')?`<button class="hbtn" data-act="sound" aria-label="${S.settings.sound?'Mute sleigh bells':'Turn on sleigh bells'}">${ic(S.settings.sound?'bell':'belloff')}</button>`:'';
+ h.innerHTML=`<div class="bar">${pip(se.festive?'hat':'bow',40)}<h1 class="brand">Prezi Planning</h1><span class="sp1"></span>${se.xday?santaHead(40,true):''}${sound}<button class="hbtn" data-act="settings" aria-label="Settings">${ic('gear')}</button></div>${fest?lightsSVG():''}`;
+ const T=[['home','Home','home'],['xmas','Christmas','tree']];if(se.advent)T.push(['advent','Advent','cal']);
+ if(tab==='advent'&&!se.advent)tab='home';
+ $('#tabs').innerHTML=T.map(t=>`<button class="${tab===t[0]?'on':''}" data-go="${t[0]}" ${tab===t[0]?'aria-current="page"':''}>${ic(t[2])}<span>${t[1]}</span>${t[0]==='advent'&&!advOpen(se.day)?'<span class="dot"></span>':''}</button>`).join('');
+ sparkles(fest);peek(se.nov&&tab==='home'&&!pid)}
+
+/* ---------- home ---------- */
+function countdown(e){const c=CBG[e.k];return`<div class="cd" style="background:${c[0]};border-color:${c[1]}"><div>${e.days===0?`<div class="lb">It's</div><div class="today">${esc(e.label)}!</div><div class="lb">Today</div>`:`<div class="lb">${esc(e.label)} is</div><div class="tiles" data-roll="${e.days}">${tiles(e.days)}</div><div class="lb">${e.days===1?'sleep':'sleeps'} away · ${fmt(e.date)}</div>`}</div>${CHAR[e.k](72)}</div>`}
+function vHome(){const se=season(),E=events();let h='';
+ if(se.advent&&!advOpen(se.day))h+=`<button class="banner adv" data-go="advent">${pip('hat',44)}<span style="flex:1"><b>Door ${se.day} is ready to open</b><small>Pip has a surprise for you</small></span>${ic('chev')}</button>`;
+ if(se.xday)h+=`<div class="banner xd">${santaHead(48,true)}<span><b>Merry Christmas!</b><small>Santa says thanks for all the planning.</small></span></div>`;
+ const prim=se.festive?E.find(e=>e.k==='xmas')||E[0]:E[0];
+ h+=prim?countdown(prim):`<div class="cd" style="background:#fff;border-color:var(--blush)"><div class="lb">Tick an occasion on someone's profile to start a countdown.</div>${pip('bow',60)}</div>`;
+ const rest=E.filter(e=>e!==prim).slice(0,2),miss=S.people.filter(p=>p.occ.bday.on&&!p.bday);
+ h+=`<div class="chips">${rest.map(e=>`<span class="chip">Then: ${esc(e.label)} · ${fmtDM(e.date)}</span>`).join('')}${miss.length?`<button class="chip warn" data-person="${miss[0].id}">Add birthdays for ${miss.length} ${miss.length===1?'person':'people'}</button>`:''}</div>`;
+ if(se.festive||se.nov){const L=xList(),b=L.filter(allBought).length;h+=`<button class="chip" data-go="xmas" style="margin-bottom:4px">Christmas shopping: ${b} of ${L.length} bought</button>`}
+ const gs=[...GROUPS,...new Set(S.people.map(p=>p.group).filter(g=>!GROUPS.includes(g)))];
+ gs.forEach(g=>{const P=S.people.filter(p=>p.group===g);if(!P.length)return;h+=`<h2 class="sec">${esc(g)}</h2><div class="grid">${P.map(tile).join('')}</div>`});
+ h+=`<h2 class="sec">Someone new?</h2><div class="grid"><button class="tile add" data-act="add-person">${ic('plus')}<span>Add person</span></button></div>`;
+ return h}
+function cardboard(s){return`<svg width="${s}" height="${Math.round(s*64/70)}" viewBox="0 0 70 64" aria-hidden="true"><rect x="6" y="24" width="58" height="38" rx="4" fill="#D9A86C" stroke="#3A1328" stroke-width="2.5"/><rect x="29" y="25" width="12" height="36" fill="#E8C28F"/><path d="M14 34 H24 M46 50 H56" stroke="#B9874E" stroke-width="2" stroke-linecap="round"/><g transform="rotate(-16 6 24)"><rect x="3" y="12" width="64" height="12" rx="3" fill="#E2B57C" stroke="#3A1328" stroke-width="2.5"/><rect x="29" y="13" width="12" height="10" fill="#EFD0A3"/></g><text class="qm" x="51" y="17" font-size="17" font-weight="800" fill="#E77FAE" stroke="#3A1328" stroke-width="1.2" paint-order="stroke" font-family="system-ui,sans-serif">?</text></svg>`}
+const JW=new Set();
+const hasOcc=p=>Object.values(p.occ).some(o=>o.on);
+function art(p,s,holly){if(!p.ideas.length)return`<span class="art${hasOcc(p)?' wob':''}" style="animation-delay:${(S.people.indexOf(p)%5)*.6}s">${cardboard(s)}</span>`;if(JW.has(p.id)){JW.delete(p.id);return`<span class="art"><span class="win">${gift(wrapOf(p),s,holly)}</span><span class="cbo">${cardboard(s)}</span></span>`}return`<span class="art">${gift(wrapOf(p),s,holly)}</span>`}
+function tile(p){const n=p.ideas.length,se=season();return`<button class="tile" data-person="${p.id}">${art(p,62,se.wrap&&S.people.indexOf(p)%3===0)}<span class="nm">${esc(p.name)}</span><span class="ct">${n?n+(n===1?' idea':' ideas'):'No ideas yet'}</span></button>`}
+
+/* ---------- person ---------- */
+const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){return u}};
+const normUrl=u=>{u=(u||'').trim();if(!u)return'';if(!/^https?:\/\//i.test(u))u='https://'+u;try{new URL(u);return u}catch(e){return''}};
+function vPerson(p){const se=season();let h=`<button class="back" data-go="home">${ic('back')} Home</button><div class="phead">${art(p,72,se.wrap)}<div><h2>${esc(p.name)}</h2><div class="grp">${esc(p.group)}</div></div><button class="hbtn edit" data-act="edit-person" data-pid="${p.id}" aria-label="Edit ${esc(p.name)}">${ic('edit')}</button></div>`;
+ const on=Object.keys(OCC).filter(k=>p.occ[k].on);
+ h+=on.length?`<div class="occ">${on.map(k=>{const d=occDate(p,k);const when=k==='bday'&&!p.bday?`<button class="chip warn" data-act="edit-person" data-pid="${p.id}">Add birthday</button>`:`<span>${fmtDM(d)} · ${daysTo(d)===0?'today!':daysTo(d)+' sleeps'}</span>`;return`<div class="row"><div><b>${OCC[k]}</b><br><span>Budget ${esc(p.occ[k].budget||'not set')}</span></div><div class="r">${when}</div></div>`}).join('')}</div>`:`<p class="hint">No occasions ticked. Ideas only, for whenever you need them.</p>`;
+ h+=`<h2 class="sec">Gift ideas (${p.ideas.length})</h2><form novalidate class="f card" id="addIdea" data-pid="${p.id}"><textarea name="t" rows="2" placeholder="Type a gift idea" aria-label="Gift idea"></textarea><input type="text" autocapitalize="off" autocorrect="off" spellcheck="false" name="u" inputmode="url" placeholder="Link to the product (optional)" aria-label="Link (optional)"><div class="err" id="addErr"></div><button class="btn pri">Add idea</button></form><div style="height:10px"></div>`;
+ const it=item(p);
+ h+=p.ideas.length?`<p class="hint">Hold an idea to edit it, mark it as gifted or delete it.</p>${p.ideas.map(i=>`<div class="idea" data-hold="idea" data-pid="${p.id}" data-iid="${i.id}"><div class="txt">${esc(i.text)}</div>${i.url?`<a class="lnk" href="${esc(i.url)}" target="_blank" rel="noopener">${ic('link')}<span>${esc(host(i.url))}</span></a>`:''}${it.gifts.some(g=>g.iid===i.id)?`<div><span class="tag">Locked in for Christmas</span></div>`:''}</div>`).join('')}`:`<div class="empty">${pip('bow',64)}<div>No ideas yet. When one pops into your head, pop it in here.</div></div>`;
+ if(p.history.length)h+=`<h2 class="sec">Gift history (${p.history.length})</h2>${p.history.slice().reverse().map(g=>`<div class="hist" data-hold="hist" data-pid="${p.id}" data-hid="${g.id}"><div>${esc(g.text)}</div><div class="meta">${esc(g.occ)} · ${new Date(g.date).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})}</div></div>`).join('')}`;
+ return h}
+
+/* ---------- christmas ---------- */
+function xList(){const L=S.people.filter(p=>p.occ.xmas.on&&p.group!==SSG),d=byId(S.xmas.drawn);if(d&&!L.includes(d))L.push(d);return L}
+function item(p){const it=S.xmas.items[p.id];if(!it)return{gifts:[]};if(!it.gifts){it.gifts=it.idea?[{iid:it.idea,text:it.text||'',bought:!!it.bought}]:[];delete it.idea;delete it.text;delete it.bought}return it}
+function setGifts(p,g){if(g.length)S.xmas.items[p.id]={gifts:g};else delete S.xmas.items[p.id]}
+const locked=p=>item(p).gifts.length>0;
+const allBought=p=>{const g=item(p).gifts;return g.length>0&&g.every(x=>x.bought)};
+function gText(p,g){const i=p.ideas.find(x=>x.id===g.iid);return i?i.text:g.text}
+const SANTA=`<svg width="96" height="104" viewBox="0 0 110 120" aria-hidden="true" style="flex:none"><g id="santa"><ellipse id="aL" cx="24" cy="80" rx="8" ry="16" fill="#E8414F" stroke="#3A1328" stroke-width="3"/><ellipse id="aR" cx="86" cy="80" rx="8" ry="16" fill="#E8414F" stroke="#3A1328" stroke-width="3"/><ellipse cx="55" cy="90" rx="32" ry="26" fill="#E8414F" stroke="#3A1328" stroke-width="3"/><rect x="25" y="86" width="60" height="9" fill="#3A1328"/><rect x="48" y="83" width="14" height="15" rx="3" fill="#FFD166" stroke="#3A1328" stroke-width="3"/><circle cx="55" cy="50" r="22" fill="#FFD9C2" stroke="#3A1328" stroke-width="3"/><path d="M33 52 Q34 78 55 78 Q76 78 77 52 Q66 60 55 60 Q44 60 33 52Z" fill="#fff" stroke="#3A1328" stroke-width="3" stroke-linejoin="round"/><path d="M44 58 Q49 54 55 58 Q61 54 66 58 Q61 63 55 60 Q49 63 44 58Z" fill="#fff" stroke="#3A1328" stroke-width="2.5"/><path id="mo" fill="none" stroke="#3A1328" stroke-width="3" stroke-linecap="round"/><ellipse class="blink" cx="47" cy="47" rx="3" ry="4" fill="#3A1328"/><ellipse class="blink" cx="63" cy="47" rx="3" ry="4" fill="#3A1328"/><path id="br" d="M41 43 L50 40 M69 43 L60 40" stroke="#3A1328" stroke-width="2.5" stroke-linecap="round"/><circle cx="39" cy="54" r="4" fill="#FF6FA5" opacity=".5"/><circle cx="71" cy="54" r="4" fill="#FF6FA5" opacity=".5"/><circle cx="55" cy="53" r="4" fill="#F0997B" stroke="#3A1328" stroke-width="2"/><path d="M33 37 Q38 6 72 11 L78 37Z" fill="#E8414F" stroke="#3A1328" stroke-width="3" stroke-linejoin="round"/><rect x="30" y="31" width="50" height="11" rx="5.5" fill="#fff" stroke="#3A1328" stroke-width="3"/><circle cx="73" cy="11" r="6" fill="#fff" stroke="#3A1328" stroke-width="3"/></g></svg>`;
+const HOLLY=`<svg class="holly" width="30" height="24" viewBox="0 0 30 24" aria-hidden="true"><ellipse cx="9" cy="10" rx="9" ry="5" fill="#3E9B6E" stroke="#3A1328" stroke-width="1.5" transform="rotate(-25 9 10)"/><ellipse cx="21" cy="10" rx="9" ry="5" fill="#3E9B6E" stroke="#3A1328" stroke-width="1.5" transform="rotate(25 21 10)"/><circle cx="15" cy="15" r="3.5" fill="#E8414F" stroke="#3A1328" stroke-width="1.5"/><circle cx="10" cy="18" r="3" fill="#E8414F" stroke="#3A1328" stroke-width="1.5"/><circle cx="20" cy="18" r="3" fill="#E8414F" stroke="#3A1328" stroke-width="1.5"/></svg>`;
+function santaState(){const L=xList(),n=L.length,i=L.filter(locked).length,b=L.filter(allBought).length;let tg=0,tb=0;L.forEach(p=>item(p).gifts.forEach(g=>{tg++;if(g.bought)tb++}));let s,t,m,f='none';
+ if(!n){s='worried';t="My list is empty! Tick Christmas on someone's profile.";m='M48 70 Q55 64 62 70'}
+ else if(b===n){s='party';t='Ho ho ho! Every present is bought. The sleigh is packed!';m='M47 65 Q55 79 63 65Z';f='#A23B72'}
+ else if(tb>0){s='happy';t=`Look at you go! ${b} of ${n} people done. ${n-b} to go.`;m='M47 66 Q55 74 63 66'}
+ else if(i===n){s='ready';t='Every idea is locked in. Off to the shops!';m='M48 66 Q55 72 62 66'}
+ else if(i>0){s='thinking';t=`Hmm, coming along nicely. Ideas locked in for ${i} of ${n} people.`;m='M52 68 Q55 64 58 68 Q55 72 52 68Z'}
+ else{s='worried';t="Uh oh, my sleigh is empty! Let's lock in some ideas.";m='M48 70 Q55 64 62 70'}
+ return{s,t,m,f,n,i,b,tg,tb}}
+function stockings(L){const n=L.length;if(!n)return'';const w=340,step=w/n,sc=Math.min(1.25,step/36);const C=['#E8414F','#3E9B6E','#A23B72','#E8414F','#3E9B6E'],GC=[['#FFD166','#E8414F'],['#9BE3C9','#A23B72'],['#F49AC1','#3E9B6E']];
+ return`<svg viewBox="0 0 340 112" width="100%" aria-label="Stockings, one per person. They fill with presents as gifts are bought." role="img" style="display:block;margin:4px 0 6px"><path d="M0 6 Q85 22 170 6 Q255 22 340 6" fill="none" stroke="#3A1328" stroke-width="2"/>${L.map((p,k)=>{const x=step*(k+.5)-6*sc,y=6+16*Math.sin(Math.PI*((x%170)/170))*.6,g=item(p).gifts,nb=Math.min(3,g.filter(z=>z.bought).length),done=allBought(p),ini=esc(p.name.replace(/^(Uncle|Auntie|Aunty)\s+/,'').slice(0,3));const px=[[-8,3],[4,1],[-2,-3]];let pr='';for(let j=0;j<nb;j++){const c=GC[j%3],q=px[j];pr+=`<g transform="translate(${q[0]} ${q[1]})"><rect x="-7" y="0" width="14" height="18" rx="2" fill="${c[0]}" stroke="#3A1328" stroke-width="1.5"/><rect x="-1.5" y="0" width="3" height="18" fill="${c[1]}"/><path d="M-5 -4 Q0 1 5 -4" fill="none" stroke="${c[1]}" stroke-width="2"/></g>`}return`<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${sc.toFixed(2)})"><g class="stock" style="animation-delay:${(k*.3).toFixed(1)}s"><path d="M0 0 V18" stroke="#3A1328" stroke-width="1.5"/>${pr}<path d="M-10 28 H10 V54 Q10 58 14 59 L22 62 Q28 64 26 70 Q24 75 17 73 L-3 67 Q-10 65 -10 58 Z" fill="${C[k%5]}" stroke="#3A1328" stroke-width="2"/><rect x="-12" y="18" width="24" height="11" rx="3" fill="${done?'#FFD166':'#fff'}" stroke="#3A1328" stroke-width="2"/><text x="0" y="27" text-anchor="middle" font-size="9" font-weight="700" fill="#A23B72" font-family="system-ui,sans-serif">${ini}</text>${done?`<path class="tws" d="M16 2 L17.5 6 L21.5 7.5 L17.5 9 L16 13 L14.5 9 L10.5 7.5 L14.5 6Z" fill="#FFD166" stroke="#3A1328" stroke-width=".8"/><path class="tws" style="animation-delay:.6s" d="M-16 36 L-15 39 L-12 40 L-15 41 L-16 44 L-17 41 L-20 40 L-17 39Z" fill="#FFD166"/>`:''}</g></g>`}).join('')}</svg>`}
+function scene(){let tm='';const deer=(r,dy,fc,dl)=>`<g class="gl" style="animation-delay:${dl}s" transform="translate(0 ${dy})"><path d="M${r+5} 25 L${r} 32 M${r+18} 25 L${r+24} 31" stroke="#3A1328" stroke-width="2" stroke-linecap="round"/><ellipse cx="${r+12}" cy="20" rx="12" ry="7" fill="${fc}" stroke="#3A1328" stroke-width="2"/><circle cx="${r+26}" cy="12" r="5" fill="${fc}" stroke="#3A1328" stroke-width="2"/><path d="M${r+24} 8 L${r+21} 1 M${r+22} 4 L${r+18} 3 M${r+28} 8 L${r+31} 1 M${r+30} 4 L${r+34} 3" stroke="#8B5A3C" stroke-width="2" stroke-linecap="round"/><circle cx="${r+28}" cy="11" r="1.2" fill="#3A1328"/></g>`;
+ for(let j=0;j<4;j++){const r=52+j*32;tm+=deer(r+3,-6,'#7E4E2E',(j*.15+.1).toFixed(2))+deer(r,0,'#A0673D',(j*.15).toFixed(2))}
+ let st='';for(let k=0;k<26;k++)st+=`<circle class="tws" style="animation-delay:${(k%7)*.3}s" cx="${(k*131)%340}" cy="${(k*37)%90}" r="${(1+(k%3)*.6).toFixed(1)}" fill="${k%3?'#FFF4FA':'#FFD166'}"/>`;
+ const lab=(x,t)=>`<text x="${x}" y="166" text-anchor="middle" font-size="11" fill="#FFF4FA" font-family="system-ui,sans-serif">${t}</text>`;
+ return`<svg class="scene" viewBox="0 0 340 172" aria-label="Santa's sleigh and eight reindeer flying from Perth to Melbourne" role="img"><rect width="340" height="172" fill="#2A1640"/>${st}<circle cx="170" cy="24" r="12" fill="#FFD166"/><circle cx="175" cy="20" r="10" fill="#2A1640"/><path d="M120 58 Q200 -6 276 30" fill="none" stroke="#FFD166" stroke-width="1.5" stroke-dasharray="3 5" opacity=".5"/><rect y="146" width="340" height="26" fill="#3B2A6B"/><path d="M10 156 H40 M60 162 H90 M200 158 H230 M260 164 H300" stroke="#6B5BA8" stroke-width="1.5"/><g fill="#4A2B5E" stroke="#3A1328" stroke-width="1"><polygon points="8,146 8,94 18,86 28,94 28,146"/><polygon points="32,146 32,84 54,74 54,146"/><rect x="60" y="50" width="20" height="96"/><rect x="84" y="72" width="16" height="74"/></g><rect x="62" y="34" width="16" height="16" fill="none" stroke="#B4889E" stroke-width="1.5"/><path d="M62 34 L78 50 M78 34 L62 50 M70 34 V20" stroke="#B4889E" stroke-width="1.2"/><path d="M106 146 Q108 118 114 102 L114 146Z" fill="#B87333" stroke="#3A1328" stroke-width="1"/><path d="M134 146 Q132 118 126 102 L126 146Z" fill="#B87333" stroke="#3A1328" stroke-width="1"/><path d="M112 146 L116 100 Q119 72 120 60 Q121 72 124 100 L128 146Z" fill="#6B8FB5" stroke="#3A1328" stroke-width="1"/><path d="M92 150 Q106 136 118 150 Q130 164 146 148" fill="none" stroke="#FFF4FA" stroke-width="2"/><g fill="#FFD166" opacity=".8"><rect x="64" y="60" width="3" height="3"/><rect x="72" y="78" width="3" height="3"/><rect x="64" y="104" width="3" height="3"/><rect x="38" y="96" width="3" height="3"/><rect x="88" y="90" width="3" height="3"/><rect x="14" y="110" width="3" height="3"/><rect x="245" y="62" width="3" height="3"/><rect x="256" y="80" width="3" height="3"/><rect x="245" y="104" width="3" height="3"/><rect x="222" y="76" width="3" height="3"/><rect x="230" y="98" width="3" height="3"/><rect x="193" y="92" width="3" height="3"/></g><rect x="190" y="74" width="14" height="72" fill="#4E6A9E" stroke="#3A1328" stroke-width="1"/><rect x="198" y="84" width="14" height="62" fill="#5B79AE" stroke="#3A1328" stroke-width="1"/><path d="M216 146 V56 Q224 42 238 48 V146Z" fill="#4A2B5E" stroke="#3A1328" stroke-width="1"/><path d="M238 60 Q248 62 238 70Z" fill="#FFD166"/><rect x="242" y="34" width="20" height="112" fill="#4A2B5E" stroke="#3A1328" stroke-width="1"/><rect x="242" y="34" width="20" height="14" fill="#FFD166" stroke="#3A1328" stroke-width="1"/><rect x="251" y="48" width="3" height="98" fill="#E8414F"/><path d="M266 146 L270 118 L274 44 L278 118 L282 146Z" fill="#8FA6C9" stroke="#3A1328" stroke-width="1"/><path d="M268 130 H280 M270 118 H278 M272 96 H276 M274 44 V24" stroke="#3A1328" stroke-width="1"/><rect x="284" y="124" width="52" height="22" fill="#E3A857" stroke="#3A1328" stroke-width="1.5"/><path d="M296 124 Q296 106 309 106 Q322 106 322 124Z" fill="#5E9C8A" stroke="#3A1328" stroke-width="1.5"/><path d="M309 106 V98" stroke="#3A1328" stroke-width="1.5"/><rect x="326" y="110" width="9" height="14" fill="#E3A857" stroke="#3A1328" stroke-width="1.5"/><path d="M325 110 L330.5 103 L336 110Z" fill="#5E9C8A" stroke="#3A1328" stroke-width="1"/><circle cx="330.5" cy="115" r="2.2" fill="#FFF4FA" stroke="#3A1328" stroke-width=".8"/><path d="M290 146 V136 Q293 132 296 136 V146 M302 146 V136 Q305 132 308 136 V146 M314 146 V136 Q317 132 320 136 V146" fill="#3A1328"/>${lab(70,'Perth')}${lab(264,'Melbourne')}<g id="sl"><g transform="scale(.62)"><circle class="tws" cx="-8" cy="22" r="3" fill="#FFD166"/><circle class="tws" style="animation-delay:.3s" cx="-20" cy="26" r="2.5" fill="#F49AC1"/><circle class="tws" style="animation-delay:.6s" cx="-32" cy="21" r="2.2" fill="#FFD166"/><path d="M44 18 H178" stroke="#FFD166" stroke-width="1.5"/>${tm}<rect x="8" y="0" width="10" height="10" fill="#F49AC1" stroke="#3A1328" stroke-width="1.5"/><rect x="19" y="2" width="9" height="8" fill="#9BE3C9" stroke="#3A1328" stroke-width="1.5"/><circle cx="35" cy="3" r="5" fill="#FFD9C2" stroke="#3A1328" stroke-width="1.5"/><path d="M30 4 Q31 11 35 11 Q39 11 40 4Z" fill="#fff" stroke="#3A1328" stroke-width="1.2"/><path d="M30 0 Q32 -10 41 -8 L40 0Z" fill="#E8414F" stroke="#3A1328" stroke-width="1.5"/><rect x="29" y="-2" width="12" height="3.5" rx="1.75" fill="#fff" stroke="#3A1328" stroke-width="1.2"/><path d="M4 10 H40 Q46 10 44 28 H10 Q2 28 4 10Z" fill="#E8414F" stroke="#3A1328" stroke-width="2"/><rect x="5" y="11" width="37" height="4" fill="#FFD166"/><path d="M12 28 V34 M36 28 V34" stroke="#FFD166" stroke-width="2"/><path d="M2 34 H44 Q50 34 48 28" fill="none" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/></g></g></svg>`}
+function vXmas(){const se=season(),d=daysTo(nextOf(XMAS)),L=xList(),st=santaState();const W=WD;
+ let h=`<div class="cd" style="background:#fff;border-color:var(--red)"><div>${d===0?`<div class="lb">It's</div><div class="today">Christmas!</div><div class="lb">Ho ho ho!</div>`:`<div class="lb">Christmas is</div><div class="tiles" data-roll="${d}">${tiles(d)}</div><div class="lb">${d===1?'sleep':'sleeps'} away</div>`}</div>${tree(124,true)}</div>`;
+ h+=`<div class="xstage s-${st.s}" id="stage">${SANTA}<div style="flex:1;min-width:0"><div class="bub" id="bub">${esc(st.t)}${HOLLY}</div><div style="margin-top:8px;font-size:12px;color:var(--berry2)">People sorted ${st.i}/${st.n} · Gifts bought ${st.tb}/${st.tg}</div><div class="prog"><i style="width:${st.n?Math.round((st.i/st.n+(st.tg?st.tb/st.tg:0)*st.i/st.n)/2*100):0}%"></i></div></div></div>`;
+ h+=stockings(L);
+ const ssP=S.people.filter(p=>p.group===SSG);
+ if(ssP.length)h+=`<div class="ss">${ic('gift')}<label for="ssSel">Secret Santa, you drew</label><select id="ssSel"><option value="">Not drawn yet</option>${ssP.map(p=>`<option value="${p.id}" ${S.xmas.drawn===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</select></div>`;
+ h+=`<p class="hint" style="margin-bottom:8px">Tap the bulb to choose one or more gifts for each person, then tap each gift once it's bought.</p>`;
+ h+=L.length?L.map(p=>{const it=item(p),i=S.people.indexOf(p),g=it.gifts,done=allBought(p);return`<div class="xcard${done?' done':''}"><div class="xrow">${gift(W[i%W.length],38)}<div class="who2"><b>${esc(p.name)}</b><small>${p.group===SSG?'Secret Santa · ':''}Budget ${esc(p.occ.xmas.budget||'not set')}${done?' · All bought!':''}</small></div><button class="tg ${g.length?'on1':''}" data-act="lock" data-pid="${p.id}" aria-label="Choose gifts for ${esc(p.name)}">${ic('bulb')}${g.length?`<span class="n">${g.length}</span>`:''}</button></div>${g.length?`<div class="glist">${g.map((z,j)=>`<button class="gline ${z.bought?'on':''}" data-act="buy" data-pid="${p.id}" data-gi="${j}" aria-pressed="${z.bought}">${ic('star')}<span>${esc(gText(p,z))}</span>${z.bought?'<em>Bought</em>':''}</button>`).join('')}</div>`:`<small style="display:block;font-size:12px;color:var(--berry2);margin-top:4px">No gifts locked in yet</small>`}</div>`}).join(''):`<div class="empty">No one has Christmas ticked yet.</div>`;
+ h+=`<div class="row2" style="margin-top:12px"><button class="btn" data-act="wrap-xmas">${ic('gift')} Wrap up Christmas</button></div>`;
+ h+=scene();return h}
+function applySanta(){const st=santaState(),mo=document.getElementById('mo');if(!mo)return;mo.setAttribute('d',st.m);mo.setAttribute('fill',st.f);document.getElementById('br').style.opacity=st.s==='worried'?1:0;if(st.s==='party'&&lastSanta&&lastSanta!=='party')confetti(60);lastSanta=st.s}
+
+/* ---------- advent ---------- */
+const ADV={1:['hat',"Welcome to December! One door a day, all the way to Christmas Eve. Let's go!"],
+2:['antlers',"All I Want for Christmas Is You came out in 1994, but it didn't hit No. 1 on the US Billboard Hot 100 until December 2019. That's 25 years later!"],
+3:['tinsel',"Elf director Jon Favreau also pops up in the movie. He plays the doctor who confirms Buddy is Walter's son."],
+4:['sunnies',"The Home Alone house is a real home at 671 Lincoln Avenue in Winnetka, Illinois, just outside Chicago."],
+5:['elf',"The first Rockefeller Center tree went up in 1931. Construction workers pooled their money for a 20-foot fir, decorated with garlands their families made."],
+6:['hat',"Taylor Swift really did grow up on a Christmas tree farm: Pine Ridge Farm in Pennsylvania. The Christmas Tree Farm video is made from her family's home movies."],
+7:['antlers',"Christmas with the Kranks is based on John Grisham's 2001 novel Skipping Christmas. Yes, the legal thriller guy!"],
+8:['tinsel',"Kelly Clarkson co-wrote Underneath the Tree with producer Greg Kurstin. She says she wrote it in the time it took for her sushi delivery to arrive."],
+9:['sunnies',"The Santa Clause (1994) was Tim Allen's first big movie role, and it kicked off a whole trilogy."],
+10:['elf',"Ariana Grande released Santa Tell Me on 24 November 2014. She co-wrote it with Savan Kotecha and Ilya."],
+11:['hat',"Before Will Ferrell was cast, Jim Carrey was once lined up to play Buddy the Elf."],
+12:['antlers',"After the season, the Rockefeller Center tree is milled into timber and donated to Habitat for Humanity to help build homes."],
+13:['tinsel',"Brenda Lee recorded Rockin' Around the Christmas Tree when she was just 13, back in 1958. It finally hit No. 1 in the US in 2023, 65 years later. You'll hear it in Home Alone too."],
+14:['sunnies',"Taylor Swift wrote Christmas Tree Farm on 1 December 2019 and released it on 6 December. Less than a week!"],
+15:['elf',"Lots of Home Alone's indoor scenes were shot on sets built inside a high school gym in Winnetka, not in the real house."],
+16:['hat',"Tim Allen came back as Santa in 2022 for the Disney+ series The Santa Clauses, 28 years after the first movie."],
+17:['antlers',"Wham!'s Last Christmas didn't reach No. 1 in the UK until 1 January 2021, 36 years after it came out. That's a chart record."],
+18:['tinsel',"All I Want for Christmas Is You has now spent more weeks at No. 1 on the Billboard Hot 100 than any other song in history."],
+19:['sunnies',"Christmas with the Kranks was written for the screen by Chris Columbus, the same director who made Home Alone."],
+20:['elf',"Elf's New York scenes, Rockefeller Center and Central Park included, were filmed on location in the real New York City."],
+21:['hat',"The Swarovski star on top of the Rockefeller Center tree was redesigned by architect Daniel Libeskind."],
+22:['antlers',"Wrapping day! Grab the paper, tape and ribbon and pop a bow on everything."],
+23:['tinsel',"Tracking Santa started by accident in 1955, when a Sears newspaper ad printed the wrong phone number and kids rang a US air defence command centre instead."],
+24:['hat',"It's Christmas Eve! Santa's sleigh leaves tonight. Merry Christmas from Pip!"]};
+const ORDER=[7,15,2,21,11,4,18,9,23,1,13,6,16,10,20,3,12,24,5,19,8,14,22,17];
+function advSync(){const y=season().year;if(S.advent.year!==y){S.advent={year:y,opened:[]};save()}}
+function advOpen(n){advSync();return S.advent.opened.includes(n)}
+let PICURL='';
+function pic(){if(PICURL)return PICURL;let st='';for(let k=0;k<40;k++)st+=`<circle cx="${(k*73)%296}" cy="${(k*41)%150}" r="${1+(k%3)*.6}" fill="${k%4?'#FFF4FA':'#FFD166'}"/>`;let bb='';[[120,150,'#E8414F'],[176,170,'#FFD166'],[100,230,'#F49AC1'],[150,215,'#9BE3C9'],[200,250,'#E8414F'],[80,310,'#FFD166'],[130,290,'#E8414F'],[190,320,'#F49AC1'],[230,300,'#FFD166'],[160,335,'#9BE3C9']].forEach(b=>bb+=`<circle cx="${b[0]}" cy="${b[1]}" r="9" fill="${b[2]}" stroke="#3A1328" stroke-width="3"/>`);
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 296 400" width="296" height="400"><rect width="296" height="400" fill="#2A1640"/>${st}<circle cx="246" cy="44" r="20" fill="#FFD166"/><circle cx="254" cy="38" r="17" fill="#2A1640"/><g fill="#FFD166"><path d="M20 70 H50 Q56 70 54 84 H26 Q18 84 20 70Z"/><ellipse cx="74" cy="72" rx="9" ry="5"/><circle cx="85" cy="66" r="3.5"/><ellipse cx="100" cy="68" rx="9" ry="5"/><circle cx="111" cy="62" r="3.5"/><ellipse cx="126" cy="64" rx="9" ry="5"/><circle cx="137" cy="58" r="3.5"/></g><path d="M18 90 H56 M54 74 H130" stroke="#FFD166" stroke-width="2"/><rect y="352" width="296" height="48" fill="#F4C0D1"/><rect x="136" y="342" width="24" height="22" fill="#8B5A3C" stroke="#3A1328" stroke-width="3"/><polygon points="148,196 36,350 260,350" fill="#3E9B6E" stroke="#3A1328" stroke-width="4" stroke-linejoin="round"/><polygon points="148,128 54,268 242,268" fill="#3E9B6E" stroke="#3A1328" stroke-width="4" stroke-linejoin="round"/><polygon points="148,72 72,190 224,190" fill="#3E9B6E" stroke="#3A1328" stroke-width="4" stroke-linejoin="round"/>${bb}<path d="M148 44 L155 60 L172 62 L159 73 L163 90 L148 81 L133 90 L137 73 L124 62 L141 60Z" fill="#FFD166" stroke="#3A1328" stroke-width="3"/><rect x="14" y="330" width="52" height="44" rx="5" fill="#F49AC1" stroke="#3A1328" stroke-width="3"/><rect x="36" y="330" width="8" height="44" fill="#A23B72"/><rect x="214" y="324" width="58" height="50" rx="5" fill="#9BE3C9" stroke="#3A1328" stroke-width="3"/><rect x="239" y="324" width="8" height="50" fill="#E8414F"/><rect x="176" y="356" width="34" height="26" rx="4" fill="#FFD166" stroke="#3A1328" stroke-width="3"/></svg>`;
+ return PICURL="url('data:image/svg+xml,"+encodeURIComponent(svg)+"')"}
+let advMsg='';
+function vAdvent(){const se=season(),done=advOpen(se.day);const IC={hat:'tree',antlers:'star',tinsel:'gift',sunnies:'star',elf:'gift'};
+ let h=`<p style="margin:0 2px 4px;font-weight:700;color:var(--berry)">${done?"Today's door is open. Come back tomorrow!":`Door ${se.day} is ready to open`}</p><div class="agrid">${ORDER.map((n,p)=>{const r=Math.floor(p/4),c=p%4,o=advOpen(n)&&n<=se.day;return`<button class="door${o?' op':''}${n===se.day&&!o?' td':''}" data-act="door" data-n="${n}" aria-label="Door ${n}${o?', open':''}"><span class="in">${ic(IC[ADV[n][0]])}</span><span class="flap" style="background-image:${pic()};background-position:-${c*76}px -${r*68}px"><span class="num" style="${n===24?'background:#E8414F;color:#fff':''}">${n}</span></span></button>`}).join('')}</div><div id="adet">${advMsg||`<div class="empty">Tap the glowing door to open today's surprise.</div>`}</div>`;
+ return h}
+function advCard(n){const m=ADV[n];return`<div class="adet">${pip(m[0],86)}<div><small>Door ${n}</small><div style="font-size:15px;line-height:1.45">${esc(m[1])}</div></div></div>`}
+
+/* ---------- peek ---------- */
+let peekT=null;function peek(on){const el=$('#peek');clearInterval(peekT);el.classList.remove('show');if(!on){el.style.display='none';return}el.style.display='flex';el.innerHTML=`<span class="pb">Christmas is coming!</span>${santaHead(70,false)}`;const cyc=()=>{el.classList.add('show');setTimeout(()=>el.classList.remove('show'),4200)};setTimeout(cyc,1500);peekT=setInterval(cyc,11000)}
+
+/* ---------- render ---------- */
+function render(anim){renderChrome();const v=$('#view');let h;
+ if(pid&&byId(pid))h=vPerson(byId(pid));else if(tab==='xmas')h=vXmas();else if(tab==='advent')h=vAdvent();else{pid=null;h=vHome()}
+ v.innerHTML=h;if(anim){v.classList.remove('enter');void v.offsetWidth;v.classList.add('enter');rollAll()}
+ if(tab==='xmas'&&!pid)applySanta();
+ $('#fab').style.display=$('#sheet').classList.contains('open')?'none':'flex'}
+
+/* ---------- sheets ---------- */
+function sheet(h){const w=$('#sheet');w.innerHTML=`<div class="scrim" data-act="close"></div><div class="panel" role="dialog" aria-modal="true"><div class="grab"></div>${h}</div>`;requestAnimationFrame(()=>w.classList.add('open'));$('#fab').style.display='none';setTimeout(()=>{const f=w.querySelector('[data-focus]');f&&f.focus()},320)}
+function closeSheet(){const w=$('#sheet');w.classList.remove('open');$('#fab').style.display='flex';setTimeout(()=>{if(!w.classList.contains('open'))w.innerHTML=''},300)}
+function ideaOf(p,iid){return p.ideas.find(i=>i.id===iid)}
+function ideaMenu(p,i){sheet(`<h3>${esc(i.text.length>60?i.text.slice(0,60)+'…':i.text)}</h3><div class="acts"><button class="btn" data-act="edit-idea" data-pid="${p.id}" data-iid="${i.id}">${ic('edit')} Edit idea</button><button class="btn gold" data-act="gift-idea" data-pid="${p.id}" data-iid="${i.id}">${ic('gift')} Mark as gifted</button><button class="btn dan" data-act="del-idea" data-pid="${p.id}" data-iid="${i.id}">${ic('trash')} Delete</button><button class="btn" data-act="close">Cancel</button></div>`)}
+function histMenu(p,g){sheet(`<h3>${esc(g.text)}</h3><div class="acts"><button class="btn" data-act="hist-back" data-pid="${p.id}" data-hid="${g.id}">${ic('undo')} Move back to ideas</button><button class="btn dan" data-act="hist-del" data-pid="${p.id}" data-hid="${g.id}">${ic('trash')} Delete from history</button><button class="btn" data-act="close">Cancel</button></div>`)}
+function editIdea(p,i){sheet(`<h3>Edit idea</h3><form novalidate class="f" id="ideaForm" data-pid="${p.id}" data-iid="${i.id}"><textarea name="t" rows="3" data-focus aria-label="Gift idea">${esc(i.text)}</textarea><input type="text" autocapitalize="off" autocorrect="off" spellcheck="false" name="u" inputmode="url" value="${esc(i.url||'')}" placeholder="Link (optional)" aria-label="Link (optional)"><div class="err"></div><button class="btn pri">Save</button><button type="button" class="btn" data-act="close">Cancel</button></form>`)}
+function giftSheet(p,i){const on=Object.keys(OCC).filter(k=>p.occ[k].on);const m=now().getMonth();let def=on.includes('xmas')&&(m>=10||m===0)?'xmas':(on[0]||'other');const opts=[...on.map(k=>[k,OCC[k]]),['other','Just because']];
+ sheet(`<h3>Gifted to ${esc(p.name)}</h3><form novalidate class="f" id="giftForm" data-pid="${p.id}" data-iid="${i.id}"><p class="lbl">What was the occasion?</p><div class="who">${opts.map(o=>`<label><input type="radio" name="o" value="${o[1]}" ${o[0]===def?'checked':''}><span>${o[1]}</span></label>`).join('')}</div><button class="btn pri">Move to gift history</button><button type="button" class="btn" data-act="close">Cancel</button></form>`)}
+function personSheet(p){const isNew=!p;p=p||{id:'',name:'',group:'Immediate family',occ:{bday:{on:false,budget:''},xmas:{on:false,budget:''},mum:{on:false,budget:''},dad:{on:false,budget:''}},bday:''};const gs=[...new Set([...GROUPS,p.group])];
+ sheet(`<h3>${isNew?'Add someone new':'Edit '+esc(p.name)}</h3><form novalidate class="f" id="personForm" data-pid="${p.id}"><label class="lbl" for="pfName">Name</label><input type="text" id="pfName" name="pname" value="${esc(p.name)}" ${isNew?'data-focus':''} autocomplete="off"><label class="lbl" for="pfGroup">Group</label><select id="pfGroup" name="group">${gs.map(g=>`<option ${g===p.group?'selected':''}>${esc(g)}</option>`).join('')}</select><p class="lbl">What do you buy for? Add a gift budget for each.</p>${Object.keys(OCC).map(k=>`<label class="oc"><input type="checkbox" name="on_${k}" ${p.occ[k].on?'checked':''}><span class="on">${OCC[k]}</span><input type="text" name="b_${k}" value="${esc(p.occ[k].budget)}" placeholder="$ budget" aria-label="${OCC[k]} budget"></label>`).join('')}<label class="lbl" for="pfBday">Birthday date</label><input type="date" id="pfBday" name="bday" value="${esc(p.bday)}"><div class="err"></div><button class="btn pri">${isNew?'Add person':'Save'}</button>${isNew?'':`<button type="button" class="btn dan" data-act="del-person" data-pid="${p.id}">${ic('trash')} Remove ${esc(p.name)}</button>`}<button type="button" class="btn" data-act="close">Cancel</button></form>`)}
+function quickAdd(){const cur=pid;sheet(`<h3>New gift idea</h3><form novalidate class="f" id="quickForm"><p class="lbl">Who's it for?</p><div class="who">${S.people.map(p=>`<label><input type="radio" name="who" value="${p.id}" ${p.id===cur?'checked':''}><span>${esc(p.name)}</span></label>`).join('')}</div><textarea name="t" rows="3" placeholder="Type a gift idea" aria-label="Gift idea" data-focus></textarea><input type="text" autocapitalize="off" autocorrect="off" spellcheck="false" name="u" inputmode="url" placeholder="Link to the product (optional)" aria-label="Link (optional)"><div class="err"></div><button class="btn pri">Save idea</button><button type="button" class="btn" data-act="close">Cancel</button></form>`)}
+function lockSheet(p){const g=item(p).gifts,has=id=>g.some(z=>z.iid===id);sheet(`<h3>Gifts for ${esc(p.name)}</h3><p class="hint">Tick every idea you're going with. Mix big and small to make up the budget (${esc(p.occ.xmas.budget||'not set')}).</p><form novalidate class="f" id="lockForm" data-pid="${p.id}">${p.ideas.map(i=>`<label class="lk ${has(i.id)?'has':''}"><input type="checkbox" name="pick" value="${i.id}" ${has(i.id)?'checked':''}><span>${esc(i.text)}${g.find(z=>z.iid===i.id&&z.bought)?' <span class="tag" style="margin:0">Bought</span>':''}</span></label>`).join('')||`<p class="hint">${esc(p.name)} has no ideas yet. Add one below.</p>`}<textarea name="t" rows="2" placeholder="Add a new idea and lock it in" aria-label="New idea"></textarea><div class="err"></div><button class="btn pri">Save gifts</button><button type="button" class="btn" data-act="close">Cancel</button></form>`)}
+function settingsSheet(){const P=[['','Today (real date)'],['2027-04-16','16 April: everyday look'],['2026-11-20','20 November: Christmas is coming'],['2026-12-12','12 December: December takeover'],['2026-12-25','25 December: Christmas Day']];
+ sheet(`<h3>Settings</h3><div class="set" style="border:0;margin:0;padding:0"><button class="btn" style="width:100%" data-act="sound">${ic(S.settings.sound?'bell':'belloff')} Sleigh bells: ${S.settings.sound?'on':'off'}</button></div>
+ <div class="set"><p><b>Backup</b><br>Everything is saved on this phone. Save a backup now and then and keep it in Google Drive.</p><div class="row2"><button class="btn" data-act="backup-file">Save backup file</button><button class="btn" data-act="backup-copy">Copy backup</button></div><p style="margin-top:10px"><b>Restore</b><br>Choose a backup file, or paste a copied backup.</p><div class="f"><input type="file" id="restoreFile" accept=".json,application/json" aria-label="Backup file"><textarea id="restoreText" rows="2" placeholder="Paste a backup here" aria-label="Paste a backup"></textarea><div class="err" id="restoreErr"></div><button class="btn" data-act="restore">Restore backup</button></div></div>
+ <div class="set"><p><b>Preview the seasons</b><br>Pretend it's another day to see each look.</p><select id="pretend" class="btn" style="width:100%;text-align:left">${P.map(o=>`<option value="${o[0]}" ${S.settings.pretend===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div>
+ <div class="set"><p><b>Christmas</b><br>After Christmas, move bought gifts into everyone's gift history and reset the checklist.</p><button class="btn" style="width:100%" data-act="wrap-xmas">${ic('gift')} Wrap up Christmas</button></div>
+ <div class="set"><button class="btn dan" style="width:100%" data-act="reset">Start again with the starting list</button></div>
+ <div class="set"><button class="btn" style="width:100%" data-act="close">Done</button></div>`)}
+function confirmSheet(title,body,act,data,label){sheet(`<h3>${esc(title)}</h3><p>${esc(body)}</p><div class="acts"><button class="btn dan" data-act="${act}" ${data}>${esc(label)}</button><button class="btn" data-act="close">Cancel</button></div>`)}
+
+/* ---------- actions ---------- */
+function backupText(){return JSON.stringify(S)}
+const ACT={
+ close:closeSheet,
+ settings:settingsSheet,
+ sound(){S.settings.sound=!S.settings.sound;save();if(S.settings.sound)bells();if($('#sheet').classList.contains('open')&&$('#pretend'))settingsSheet();render(false)},
+ 'add-person'(){personSheet(null)},
+ 'edit-person'(el){personSheet(byId(el.dataset.pid))},
+ 'del-person'(el){const p=byId(el.dataset.pid);confirmSheet(`Remove ${p.name}?`,`Their ideas and gift history will be removed too.`,'confirm-del-person',`data-pid="${p.id}"`,'Remove')},
+ 'confirm-del-person'(el){const p=byId(el.dataset.pid);S.people=S.people.filter(x=>x!==p);delete S.xmas.items[p.id];if(S.xmas.drawn===p.id)S.xmas.drawn='';save();closeSheet();toast(`${p.name} removed`,false);go('home')},
+ 'edit-idea'(el){const p=byId(el.dataset.pid);editIdea(p,ideaOf(p,el.dataset.iid))},
+ 'gift-idea'(el){const p=byId(el.dataset.pid);giftSheet(p,ideaOf(p,el.dataset.iid))},
+ 'del-idea'(el){const p=byId(el.dataset.pid),i=ideaOf(p,el.dataset.iid);confirmSheet('Delete this idea?',i.text,'confirm-del-idea',`data-pid="${p.id}" data-iid="${i.id}"`,'Delete')},
+ 'confirm-del-idea'(el){const p=byId(el.dataset.pid);p.ideas=p.ideas.filter(i=>i.id!==el.dataset.iid);setGifts(p,item(p).gifts.filter(g=>g.iid!==el.dataset.iid));save();closeSheet();render(false);toast('Idea deleted',false)},
+ 'hist-back'(el){const p=byId(el.dataset.pid),g=p.history.find(x=>x.id===el.dataset.hid);p.history=p.history.filter(x=>x!==g);p.ideas.push({id:uid(),text:g.text,url:g.url||'',created:Date.now()});save();closeSheet();render(false);toast('Moved back to ideas')},
+ 'hist-del'(el){const p=byId(el.dataset.pid);p.history=p.history.filter(x=>x.id!==el.dataset.hid);save();closeSheet();render(false);toast('Removed from history',false)},
+ lock(el){lockSheet(byId(el.dataset.pid))},
+ buy(el){const p=byId(el.dataset.pid),g=item(p).gifts,z=g[+el.dataset.gi];if(!z)return;z.bought=!z.bought;setGifts(p,g);save();if(z.bought){bells();if(allBought(p))confetti(20)}render(false);const b=document.querySelector(`.gline[data-pid="${p.id}"][data-gi="${el.dataset.gi}"]`);b&&b.classList.add('pp')},
+ 'wrap-xmas'(){confirmSheet('Wrap up Christmas?','Bought gifts with a locked-in idea move into each person\'s gift history. The checklist and Secret Santa draw reset for next year.','confirm-wrap','','Wrap it up')},
+ 'confirm-wrap'(){let n=0;const y=now().getMonth()>=6?now().getFullYear():now().getFullYear()-1;S.people.forEach(p=>{item(p).gifts.forEach(z=>{if(!z.bought)return;const i=ideaOf(p,z.iid);p.ideas=p.ideas.filter(x=>x.id!==z.iid);p.history.push({id:uid(),text:i?i.text:z.text,url:i&&i.url||'',occ:'Christmas '+y,date:Date.now()});n++})});S.xmas={drawn:'',items:{}};save();closeSheet();render(true);confetti(40);toast(n?`${n} ${n===1?'gift':'gifts'} moved to history`:'Checklist reset for next year')},
+ reset(){confirmSheet('Start again?','This replaces everything with the starting list of people. Save a backup first if you want to keep your ideas.','confirm-reset','','Start again')},
+ 'confirm-reset'(){const keep=S.settings;S=seed();S.settings=keep;save();closeSheet();go('home');toast('Fresh start!')},
+ 'backup-file'(){const blob=new Blob([backupText()],{type:'application/json'}),name=`prezi-planning-backup-${new Date().toISOString().slice(0,10)}.json`;try{const file=new File([blob],name,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:'Prezi Planning backup'}).catch(()=>{});return}}catch(e){}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);toast('Backup file saved',false)},
+ 'backup-copy'(){try{navigator.clipboard.writeText(backupText()).then(()=>toast('Backup copied',false),()=>toast("Couldn't copy here",false))}catch(e){toast("Couldn't copy here",false)}},
+ restore(){const err=$('#restoreErr'),f=$('#restoreFile').files[0],t=$('#restoreText').value.trim();const apply=txt=>{let d=null;try{d=fix(JSON.parse(txt))}catch(e){}if(!d){err.textContent="That doesn't look like a Prezi Planning backup.";return}S=d;save();closeSheet();go('home');toast('Backup restored')};if(f){const r=new FileReader();r.onload=()=>apply(r.result);r.readAsText(f)}else if(t)apply(t);else err.textContent='Choose a backup file or paste one first.'},
+ door(el){const n=+el.dataset.n,se=season();if(n>se.day){el.classList.remove('shk');void el.offsetWidth;el.classList.add('shk');advMsg=`<div class="empty">No peeking! Door ${n} opens on ${n} December.</div>`;$('#adet').innerHTML=advMsg;return}if(!advOpen(n)){S.advent.opened.push(n);save();el.classList.add('op');el.classList.remove('td');bells();renderChrome()}advMsg=advCard(n);$('#adet').innerHTML=advMsg}
+};
+function flashBtn(id,act){const b=document.querySelector(`.tg[data-act="${act}"][data-pid="${id}"]`);if(b)b.classList.add('pp')}
+
+/* ---------- events ---------- */
+let lp=null,lpFired=false;
+function hold(el){const p=byId(el.dataset.pid);if(!p)return;if(el.dataset.hold==='idea'){const i=ideaOf(p,el.dataset.iid);i&&ideaMenu(p,i)}else{const g=p.history.find(x=>x.id===el.dataset.hid);g&&histMenu(p,g)}}
+const cancelLp=()=>{if(lp){clearTimeout(lp.t);lp.el.classList.remove('pressing');lp=null}};
+document.addEventListener('pointerdown',e=>{const el=e.target.closest('[data-hold]');if(!el)return;lpFired=false;el.classList.add('pressing');lp={el,x:e.clientX,y:e.clientY,t:setTimeout(()=>{lpFired=true;el.classList.remove('pressing');try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}lp=null;hold(el)},480)}});
+document.addEventListener('pointerup',cancelLp);document.addEventListener('pointercancel',cancelLp);
+document.addEventListener('pointermove',e=>{if(lp&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)>10)cancelLp()});
+document.addEventListener('contextmenu',e=>{const el=e.target.closest('[data-hold]');if(el){e.preventDefault();if(!lpFired){cancelLp();lpFired=true;hold(el)}}});
+document.addEventListener('click',e=>{
+ if(lpFired&&e.target.closest('[data-hold]')){e.preventDefault();lpFired=false;return}
+ const a=e.target.closest('[data-act]');if(a){e.preventDefault();ACT[a.dataset.act]&&ACT[a.dataset.act](a);return}
+ const t=e.target.closest('[data-person]');if(t){const id=t.dataset.person;if(t.classList.contains('tile')){t.classList.add('lift');setTimeout(()=>go('home',id),420)}else go('home',id);return}
+ const g=e.target.closest('[data-go]');if(g){advMsg='';go(g.dataset.go);return}
+});
+$('#fab').addEventListener('click',quickAdd);
+$('#peek').addEventListener('click',()=>go('xmas'));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#sheet').classList.contains('open'))closeSheet()});
+document.addEventListener('change',e=>{
+ if(e.target.id==='ssSel'){S.xmas.drawn=e.target.value;save();render(false);if(e.target.value)toast(`Secret Santa: ${byId(e.target.value).name}`)}
+ if(e.target.id==='pretend'){S.settings.pretend=e.target.value;save();advMsg='';closeSheet();lastSanta='';go(season().advent?tab:(tab==='advent'?'home':tab),pid);if(season().xday)confetti(70)}
+});
+function celebrate(){confetti(24);const b=$('#fab');b.classList.remove('spin');void b.offsetWidth;b.classList.add('spin')}
+document.addEventListener('submit',e=>{const f=e.target;e.preventDefault();const err=f.querySelector('.err');const T=f.t?f.t.value.trim():'';
+ if(f.id==='addIdea'||f.id==='quickForm'){const p=byId(f.id==='addIdea'?f.dataset.pid:(f.querySelector('input[name=who]:checked')||{}).value);if(!p){err.textContent='Pick who the idea is for.';return}if(!T){err.textContent='Type the idea first.';f.t.focus();return}const raw=f.u.value.trim(),u=normUrl(raw);if(raw&&!u){err.textContent="That link doesn't look right. Check it or leave it blank.";return}p.ideas.push({id:uid(),text:T,url:u,created:Date.now()});if(p.ideas.length===1)JW.add(p.id);save();if(f.id==='quickForm')closeSheet();render(false);celebrate();toast(`Saved for ${p.name}!`);return}
+ if(f.id==='ideaForm'){const p=byId(f.dataset.pid),i=ideaOf(p,f.dataset.iid);if(!T){err.textContent='The idea needs some words.';return}const raw=f.u.value.trim(),u=normUrl(raw);if(raw&&!u){err.textContent="That link doesn't look right.";return}i.text=T;i.url=u;item(p).gifts.forEach(z=>{if(z.iid===i.id)z.text=T});save();closeSheet();render(false);toast('Idea updated',false);return}
+ if(f.id==='giftForm'){const p=byId(f.dataset.pid),i=ideaOf(p,f.dataset.iid),o=(f.querySelector('input[name=o]:checked')||{}).value||'Just because';p.ideas=p.ideas.filter(x=>x!==i);p.history.push({id:uid(),text:i.text,url:i.url||'',occ:o,date:Date.now()});const g=item(p).gifts;g.forEach(z=>{if(z.iid===i.id)z.text=i.text});setGifts(p,g);save();closeSheet();render(false);confetti(40);toast('Moved to gift history');return}
+ if(f.id==='lockForm'){const p=byId(f.dataset.pid),old=item(p).gifts,picks=[...f.querySelectorAll('input[name=pick]:checked')].map(x=>x.value);if(T){const i={id:uid(),text:T,url:'',created:Date.now()};p.ideas.push(i);picks.push(i.id)}const g=picks.map(id=>{const o=old.find(z=>z.iid===id),i=ideaOf(p,id);return{iid:id,text:i?i.text:(o?o.text:''),bought:o?o.bought:false}});const more=g.length>old.length;setGifts(p,g);save();closeSheet();if(more)bells();render(false);toast(g.length?`${g.length} ${g.length===1?'gift':'gifts'} locked in for ${p.name}`:`Gifts cleared for ${p.name}`,g.length>0);return}
+ if(f.id==='personForm'){const name=f.elements.pname.value.trim();if(!name){err.textContent='Add a name.';f.elements.pname.focus();return}let p=byId(f.dataset.pid);const isNew=!p;if(isNew){p={id:uid(),name,group:'',occ:{},bday:'',ideas:[],history:[]}}p.name=name;p.group=f.group.value;for(const k in OCC)p.occ[k]={on:f['on_'+k].checked,budget:f['b_'+k].value.trim()};p.bday=f.bday.value;if(isNew)S.people.push(p);if(p.group!==SSG&&S.xmas.drawn===p.id)S.xmas.drawn='';save();closeSheet();if(isNew){go('home',p.id);toast(`${name} added!`)}else{render(false);toast('Saved',false)}return}
+});
+
+/* ---------- start ---------- */
+if('serviceWorker' in navigator&&location.protocol==='https:'&&location.hostname.endsWith('github.io')){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
+advSync();render(true);if(season().xday)setTimeout(()=>confetti(70),400);
+}
+</script>
+</body>
+</html>
