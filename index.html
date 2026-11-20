@@ -61,6 +61,18 @@ h2.sec{font-size:14px;font-weight:600;color:var(--berry2);margin:18px 2px 8px}
 .mt{position:relative;display:inline-block;background:var(--red);color:#fff;font-size:14px;font-weight:700;width:22px;text-align:center;border-radius:6px;border:2px solid var(--ink);line-height:1.45}
 .mt.z{background:var(--blush);color:var(--pink2);border-color:var(--pink2)}
 .mt .hat{position:absolute;left:-7px;top:-12px;transform:rotate(-14deg);pointer-events:none}
+.note{position:relative;padding:18px 14px 12px;margin:14px 4px 16px;border:2px solid var(--ink);border-radius:4px}
+.note.soon{background:#FFF3C4;transform:rotate(-1.2deg)}
+.note.urg{background:#FFD6DC;animation:jig 2.6s infinite}
+@keyframes jig{0%,80%,100%{transform:rotate(1.2deg)}85%{transform:rotate(-1deg)}90%{transform:rotate(2.5deg)}95%{transform:rotate(.3deg)}}
+.note .tape{position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(-3deg);width:64px;height:18px;background:rgba(155,227,201,.9);border:1.5px solid var(--ink)}
+.note .pin{position:absolute;top:-12px;left:50%;transform:translateX(-50%)}
+.nh{font-family:'Pacifico',cursive;font-size:18px;margin:0;color:var(--berry);line-height:1.3}.urg .nh{color:#B3261E}
+.nt{font-weight:700;margin:2px 0 0;font-size:15px}.ns{font-size:14px;margin:2px 0 0;color:var(--berry2)}
+.nacts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.nb{min-height:42px;border-radius:12px;border:2px solid var(--ink);background:#fff;font-weight:600;font-size:14px;padding:6px 12px}
+.nb.pri{background:var(--berry);color:#fff}.urg .nb.pri{background:var(--red)}
+.nb.ghost{border-color:transparent;background:none;margin-left:auto}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px}
 .chip{font-size:13px;background:#fff;border:1.5px solid var(--blush);border-radius:12px;padding:4px 10px;color:var(--ink);text-align:left}
 button.chip{min-height:34px}
@@ -288,9 +300,9 @@ function seed(){return{v:1,people:[
  mk('Auntie Rose','Extended family',{bday:'$50–60',xmas:'$50–60'}),
  mk('Nona',SSG,{xmas:'~$30'}),mk('Uncle Paul',SSG,{xmas:'~$30'}),mk('Nick',SSG,{xmas:'~$30'}),mk('Tessa',SSG,{xmas:'~$30'}),
  mk('Ben','Ideas only',{}),mk('Siena','Ideas only',{})],
- xmas:{drawn:'',items:{}},advent:{year:0,opened:[]},settings:{sound:true,pretend:''}}}
+ xmas:{drawn:'',items:{}},advent:{year:0,opened:[]},rem:{bought:{},later:{}},settings:{sound:true,pretend:''}}}
 let S=null;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-function fix(s){if(!s||!Array.isArray(s.people))return null;s.xmas=s.xmas||{drawn:'',items:{}};s.xmas.items=s.xmas.items||{};s.advent=s.advent||{year:0,opened:[]};s.settings=Object.assign({sound:true,pretend:''},s.settings||{});s.people.forEach(p=>{p.ideas=p.ideas||[];p.history=p.history||[];p.occ=p.occ||{};for(const k in OCC)p.occ[k]=p.occ[k]||{on:false,budget:''}});return s}
+function fix(s){if(!s||!Array.isArray(s.people))return null;s.xmas=s.xmas||{drawn:'',items:{}};s.xmas.items=s.xmas.items||{};s.advent=s.advent||{year:0,opened:[]};s.rem=s.rem||{bought:{},later:{}};s.rem.bought=s.rem.bought||{};s.rem.later=s.rem.later||{};s.settings=Object.assign({sound:true,pretend:''},s.settings||{});s.people.forEach(p=>{p.ideas=p.ideas||[];p.history=p.history||[];p.occ=p.occ||{};for(const k in OCC)p.occ[k]=p.occ[k]||{on:false,budget:''}});return s}
 S=fix(S)||seed();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 const byId=id=>S.people.find(p=>p.id===id);
@@ -363,6 +375,7 @@ function countdown(e){const c=CBG[e.k];return`<div class="cd" style="background:
 function vHome(){const se=season(),E=events();let h='';
  if(se.advent&&!advOpen(se.day))h+=`<button class="banner adv" data-go="advent">${pip('hat',44)}<span style="flex:1"><b>Door ${se.day} is ready to open</b><small>Pip has a surprise for you</small></span>${ic('chev')}</button>`;
  if(se.xday)h+=`<div class="banner xd">${santaHead(48,true)}<span><b>Merry Christmas!</b><small>Santa says thanks for all the planning.</small></span></div>`;
+ h+=reminders().map(noteHTML).join('');
  const prim=se.festive?E.find(e=>e.k==='xmas')||E[0]:E[0];
  h+=prim?countdown(prim):`<div class="cd" style="background:#fff;border-color:var(--blush)"><div class="lb">Tick an occasion on someone's profile to start a countdown.</div>${pip('bow',60)}</div>`;
  const xe=E.find(e=>e.k==='xmas'),showXB=xe&&prim&&prim.k!=='xmas';
@@ -378,6 +391,17 @@ function cardboard(s){return`<svg width="${s}" height="${Math.round(s*64/70)}" v
 const JW=new Set();
 const hasOcc=p=>Object.values(p.occ).some(o=>o.on);
 function art(p,s,holly){if(!p.ideas.length)return`<span class="art${hasOcc(p)?' wob':''}" style="animation-delay:${(S.people.indexOf(p)%5)*.6}s">${cardboard(s)}</span>`;if(JW.has(p.id)){JW.delete(p.id);return`<span class="art"><span class="win">${gift(wrapOf(p),s,holly)}</span><span class="cbo">${cardboard(s)}</span></span>`}return`<span class="art">${gift(wrapOf(p),s,holly)}</span>`}
+const joinNames=a=>a.length<=1?(a[0]||''):a.length<=3?a.slice(0,-1).join(', ')+' and '+a[a.length-1]:a.slice(0,3).join(', ')+' and '+(a.length-3)+' more';
+const isoD=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function reminders(){const R=[];
+ S.people.forEach(p=>['bday','mum','dad'].forEach(k=>{if(!p.occ[k].on)return;const d=occDate(p,k);if(!d)return;const days=daysTo(d);if(days<0||days>30)return;const key=k+':'+p.id+':'+isoD(d);if(S.rem.bought[key])return;if(p.history.some(g=>g.occ===OCC[k]&&g.date>d-60*864e5&&g.date<=+d+864e5))return;if(days>14&&S.rem.later[key])return;R.push({key,days,k,p,label:k==='bday'?p.name+"'s birthday":OCC[k]+' for '+p.name})}));
+ const xd=nextOf(XMAS),xdays=daysTo(xd);if(xdays>=0&&xdays<=30){const L=xList().filter(p=>!allBought(p)),key='xmas:'+isoD(xd);if(L.length&&!(xdays>14&&S.rem.later[key]))R.push({key,days:xdays,k:'xmas',names:L.map(p=>p.name)})}
+ return R.sort((a,b)=>a.days-b.days).slice(0,3)}
+const TAPE='<span class="tape" aria-hidden="true"></span>',PIN='<svg class="pin" width="24" height="24" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="9" r="7" fill="#E8414F" stroke="#3A1328" stroke-width="2"/><circle cx="8.5" cy="6.5" r="2" fill="#fff" opacity=".7"/></svg>';
+function noteHTML(r){const urg=r.days<=14,sl=r.days===1?'sleep':'sleeps',head=urg?(r.days===0?"Eek, it's today!":`Eek, ${r.days} ${sl}!`):"Don't forget!";let t,sub='',btn;
+ if(r.k==='xmas'){t=r.days===0?"It's Christmas!":urg?`Christmas is ${r.days} ${sl} away!`:`Christmas in ${r.days} ${sl}`;sub=`Still to buy for ${esc(joinNames(r.names))}.`;btn=`<button class="nb pri" data-go="xmas">Open Christmas list</button>${urg?'':`<button class="nb ghost" data-act="rem-later" data-key="${r.key}">Later</button>`}`}
+ else{const n=r.p.ideas.length;t=urg?`${esc(r.label)} is close and there's no gift yet`:`${esc(r.label)} in ${r.days} ${sl}`;if(!urg)sub=n?`You've got ${n} ${n===1?'idea':'ideas'} saved for ${esc(r.p.name)}.`:`No ideas saved for ${esc(r.p.name)} yet.`;btn=`<button class="nb pri" data-person="${r.p.id}">${urg?'Pick a gift':'See ideas'}</button><button class="nb" data-act="rem-bought" data-key="${r.key}">Bought it</button>${urg?'':`<button class="nb ghost" data-act="rem-later" data-key="${r.key}">Later</button>`}`}
+ return`<div class="note ${urg?'urg':'soon'}">${urg?PIN:TAPE}<p class="nh">${head}</p><p class="nt">${t}</p>${sub?`<p class="ns">${sub}</p>`:''}<div class="nacts">${btn}</div></div>`}
 function tile(p){const n=p.ideas.length,se=season();return`<button class="tile" data-person="${p.id}">${art(p,62,se.wrap&&S.people.indexOf(p)%3===0)}<span class="nm">${esc(p.name)}</span><span class="ct">${n?n+(n===1?' idea':' ideas'):'No ideas yet'}</span></button>`}
 
 /* ---------- person ---------- */
@@ -409,8 +433,9 @@ function santaState(){const L=xList(),n=L.length,i=L.filter(locked).length,b=L.f
  else if(i>0){s='thinking';t=`Hmm, coming along nicely. Ideas locked in for ${i} of ${n} people.`;m='M52 68 Q55 64 58 68 Q55 72 52 68Z'}
  else{s='worried';t="Uh oh, my sleigh is empty! Let's lock in some ideas.";m='M48 70 Q55 64 62 70'}
  return{s,t,m,f,n,i,b,tg,tb}}
-function stockings(L){const n=L.length;if(!n)return'';const w=340,step=w/n,sc=Math.min(1.25,step/36);const C=['#E8414F','#3E9B6E','#A23B72','#E8414F','#3E9B6E'],GC=[['#FFD166','#E8414F'],['#9BE3C9','#A23B72'],['#F49AC1','#3E9B6E']];
- return`<svg viewBox="0 0 340 112" width="100%" aria-label="Stockings, one per person. They fill with presents as gifts are bought." role="img" style="display:block;margin:4px 0 6px"><path d="M0 6 Q85 22 170 6 Q255 22 340 6" fill="none" stroke="#3A1328" stroke-width="2"/>${L.map((p,k)=>{const x=step*(k+.5)-6*sc,y=6+16*Math.sin(Math.PI*((x%170)/170))*.6,g=item(p).gifts,nb=Math.min(3,g.filter(z=>z.bought).length),done=allBought(p),ini=esc(p.name.replace(/^(Uncle|Auntie|Aunty)\s+/,'').slice(0,3));const px=[[-8,3],[4,1],[-2,-3]];let pr='';for(let j=0;j<nb;j++){const c=GC[j%3],q=px[j];pr+=`<g transform="translate(${q[0]} ${q[1]})"><rect x="-7" y="0" width="14" height="18" rx="2" fill="${c[0]}" stroke="#3A1328" stroke-width="1.5"/><rect x="-1.5" y="0" width="3" height="18" fill="${c[1]}"/><path d="M-5 -4 Q0 1 5 -4" fill="none" stroke="${c[1]}" stroke-width="2"/></g>`}return`<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${sc.toFixed(2)})"><g class="stock" style="animation-delay:${(k*.3).toFixed(1)}s"><path d="M0 0 V18" stroke="#3A1328" stroke-width="1.5"/>${pr}<path d="M-10 28 H10 V54 Q10 58 14 59 L22 62 Q28 64 26 70 Q24 75 17 73 L-3 67 Q-10 65 -10 58 Z" fill="${C[k%5]}" stroke="#3A1328" stroke-width="2"/><rect x="-12" y="18" width="24" height="11" rx="3" fill="${done?'#FFD166':'#fff'}" stroke="#3A1328" stroke-width="2"/><text x="0" y="27" text-anchor="middle" font-size="9" font-weight="700" fill="#A23B72" font-family="system-ui,sans-serif">${ini}</text>${done?`<path class="tws" d="M16 2 L17.5 6 L21.5 7.5 L17.5 9 L16 13 L14.5 9 L10.5 7.5 L14.5 6Z" fill="#FFD166" stroke="#3A1328" stroke-width=".8"/><path class="tws" style="animation-delay:.6s" d="M-16 36 L-15 39 L-12 40 L-15 41 L-16 44 L-17 41 L-20 40 L-17 39Z" fill="#FFD166"/>`:''}</g></g>`}).join('')}</svg>`}
+function stockings(L){const n=L.length;if(!n)return'';const step=340/n,sc=Math.min(1,step/46);const C=['#E8414F','#3E9B6E','#A23B72'],GC=[['#FFD166','#E8414F'],['#9BE3C9','#A23B72'],['#F49AC1','#3E9B6E']];
+ return`<svg viewBox="0 0 340 ${Math.ceil(16+108*sc)}" width="100%" aria-label="Stockings, one per person. They fill with presents as gifts are bought." role="img" style="display:block;margin:4px 0 8px;overflow:visible"><path d="M0 6 Q85 22 170 6 Q255 22 340 6" fill="none" stroke="#3A1328" stroke-width="2"/>${L.map((p,k)=>{const x=step*(k+.5)-5*sc,y=6+16*Math.sin(Math.PI*((x%170)/170))*.6,g=item(p).gifts,nb=Math.min(3,g.filter(z=>z.bought).length),done=allBought(p),nm=esc(p.name),fs=p.name.length>9?9:p.name.length>7?10:11;const px=[[-8,-2],[4,-4],[-2,-8]];let pr='';for(let j=0;j<nb;j++){const c=GC[j%3],q=px[j];pr+=`<g transform="translate(${q[0]} ${q[1]})"><rect x="-7" y="0" width="14" height="18" rx="2" fill="${c[0]}" stroke="#3A1328" stroke-width="1.5"/><rect x="-1.5" y="0" width="3" height="18" fill="${c[1]}"/><path d="M-5 -4 Q0 1 5 -4" fill="none" stroke="${c[1]}" stroke-width="2"/></g>`}
+ return`<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${sc.toFixed(2)})"><g class="stock" style="animation-delay:${(k*.3).toFixed(1)}s"><path d="M0 0 V16" stroke="#3A1328" stroke-width="1.5"/>${pr}<path d="M-13 24 H13 V82 Q13 86 17 87 L27 90 Q33 92 31 98 Q29 103 22 101 L-3 95 Q-13 92 -13 86 Z" fill="${C[k%3]}" stroke="#3A1328" stroke-width="2"/><rect x="-15" y="14" width="30" height="12" rx="4" fill="${done?'#FFD166':'#fff'}" stroke="#3A1328" stroke-width="2"/><text transform="translate(1 55) rotate(-90)" text-anchor="middle" dominant-baseline="central" font-family="Pacifico,cursive" font-size="${fs}" fill="#FFF4FA">${nm}</text>${done?`<path class="tws" d="M20 6 L21.5 10 L25.5 11.5 L21.5 13 L20 17 L18.5 13 L14.5 11.5 L18.5 10Z" fill="#FFD166" stroke="#3A1328" stroke-width=".8"/><path class="tws" style="animation-delay:.6s" d="M-20 40 L-19 43 L-16 44 L-19 45 L-20 48 L-21 45 L-24 44 L-21 43Z" fill="#FFD166"/>`:''}</g></g>`}).join('')}</svg>`}
 function scene(){let tm='';const deer=(r,dy,fc,dl)=>`<g class="gl" style="animation-delay:${dl}s" transform="translate(0 ${dy})"><path d="M${r+5} 25 L${r} 32 M${r+18} 25 L${r+24} 31" stroke="#3A1328" stroke-width="2" stroke-linecap="round"/><ellipse cx="${r+12}" cy="20" rx="12" ry="7" fill="${fc}" stroke="#3A1328" stroke-width="2"/><circle cx="${r+26}" cy="12" r="5" fill="${fc}" stroke="#3A1328" stroke-width="2"/><path d="M${r+24} 8 L${r+21} 1 M${r+22} 4 L${r+18} 3 M${r+28} 8 L${r+31} 1 M${r+30} 4 L${r+34} 3" stroke="#8B5A3C" stroke-width="2" stroke-linecap="round"/><circle cx="${r+28}" cy="11" r="1.2" fill="#3A1328"/></g>`;
  for(let j=0;j<4;j++){const r=52+j*32;tm+=deer(r+3,-6,'#7E4E2E',(j*.15+.1).toFixed(2))+deer(r,0,'#A0673D',(j*.15).toFixed(2))}
  let st='';for(let k=0;k<26;k++)st+=`<circle class="tws" style="animation-delay:${(k%7)*.3}s" cx="${(k*131)%340}" cy="${(k*37)%90}" r="${(1+(k%3)*.6).toFixed(1)}" fill="${k%3?'#FFF4FA':'#FFD166'}"/>`;
@@ -514,6 +539,8 @@ const ACT={
  'confirm-del-idea'(el){const p=byId(el.dataset.pid);p.ideas=p.ideas.filter(i=>i.id!==el.dataset.iid);setGifts(p,item(p).gifts.filter(g=>g.iid!==el.dataset.iid));save();closeSheet();render(false);toast('Idea deleted',false)},
  'hist-back'(el){const p=byId(el.dataset.pid),g=p.history.find(x=>x.id===el.dataset.hid);p.history=p.history.filter(x=>x!==g);p.ideas.push({id:uid(),text:g.text,url:g.url||'',created:Date.now()});save();closeSheet();render(false);toast('Moved back to ideas')},
  'hist-del'(el){const p=byId(el.dataset.pid);p.history=p.history.filter(x=>x.id!==el.dataset.hid);save();closeSheet();render(false);toast('Removed from history',false)},
+ 'rem-bought'(el){S.rem.bought[el.dataset.key]=true;save();render(false);confetti(24);toast('Nice one! Reminder cleared')},
+ 'rem-later'(el){S.rem.later[el.dataset.key]=true;save();render(false);toast("I'll remind you again at 14 sleeps",false)},
  lock(el){lockSheet(byId(el.dataset.pid))},
  buy(el){const p=byId(el.dataset.pid),g=item(p).gifts,z=g[+el.dataset.gi];if(!z)return;z.bought=!z.bought;setGifts(p,g);save();if(z.bought){bells();if(allBought(p))confetti(20)}render(false);const b=document.querySelector(`.gline[data-pid="${p.id}"][data-gi="${el.dataset.gi}"]`);b&&b.classList.add('pp')},
  'wrap-xmas'(){confirmSheet('Wrap up Christmas?','Bought gifts with a locked-in idea move into each person\'s gift history. The checklist and Secret Santa draw reset for next year.','confirm-wrap','','Wrap it up')},
